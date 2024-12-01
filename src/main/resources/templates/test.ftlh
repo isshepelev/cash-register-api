@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Касса ресторана</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2c2f33; /* Темный фон */
+            color: #ffffff; /* Белый текст */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            background-color: #23272a; /* Темно-серый фон секций */
+        }
+
+        .orders-section, .categories-section {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .orders-section {
+            width: 40%;
+            margin-right: 10px;
+            display: flex;
+            flex-direction: column;
+            background-color: #2c2f33; /* Темный блок */
+        }
+
+        .categories-section {
+            width: 60%;
+            background-color: #2c2f33;
+        }
+
+        .orders-table, .categories-section h3 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .orders-table ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .orders-table li {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.1em;
+            background-color: #3a3f44; /* Темная подложка под заказы */
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #ff6b6b; /* Красная кнопка */
+            color: #fff;
+        }
+
+        button:hover {
+            background-color: #ff4d4d;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #e63939;
+            transform: translateY(1px);
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .navigation-buttons button {
+            width: 48%; /* Делаем кнопки одинаковой ширины */
+            padding: 15px;
+            font-size: 16px;
+            background-color: #3a3f44;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        table td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        table td button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #f54900; /* Желтые кнопки */
+            border-radius: 5px;
+        }
+
+        .full-width-button {
+            width: 100%;
+            margin-bottom: 20px; /* Отступ под кнопкой */
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            margin: 0 5px; /* Отступ между кнопками */
+            background-color: #6c757d; /* Темная кнопка */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Левая секция -->
+    <div class="orders-section">
+        <h3>Добавленные заказы</h3>
+        <div class="orders-table">
+            <ul id="orderList">
+                <!-- Добавленные заказы будут появляться здесь -->
+            </ul>
+        </div>
+        <!-- Кнопка создать заказ -->
+        <button class="full-width-button">Создать заказ</button>
+        <!-- Кнопки войти и сбросить -->
+        <div class="action-buttons">
+            <button onclick="login()">Войти</button>
+            <button onclick="resetOrders()">Сбросить</button>
+        </div>
+    </div>
+
+    <!-- Правая секция -->
+    <div class="categories-section">
+        <h3>Категории</h3>
+        <table>
+            <tr>
+                <td><button onclick="addOrder('Бургер')">Бургер</button></td>
+                <td><button onclick="addOrder('Пицца')">Пицца</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="addOrder('Соус')">Соус</button></td>
+                <td><button onclick="addOrder('Роллы')">Роллы</button></td>
+            </tr>
+        </table>
+        <!-- Кнопки навигации -->
+        <div class="navigation-buttons">
+            <button onclick="prevPage()">Назад</button>
+            <button onclick="nextPage()">Вперед</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Функция для добавления заказа в список
+    function addOrder(item) {
+        const orderList = document.getElementById('orderList');
+        const listItem = document.createElement('li');
+        listItem.textContent = item;
+        orderList.appendChild(listItem);
+    }
+
+    // Функция для сброса заказов
+    function resetOrders() {
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = ''; // Удаляем все элементы
+    }
+
+    // Функция для кнопки "Войти" (пока просто алерт)
+    function login() {
+        alert('Вход выполнен');
+    }
+
+    // Навигация (пока просто заглушки)
+    function prevPage() {
+        alert('Предыдущая страница товаров');
+    }
+
+    function nextPage() {
+        alert('Следующая страница товаров');
+    }
+</script>
+</body>
+</html>
