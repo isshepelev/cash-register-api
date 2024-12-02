@@ -12,3 +12,17 @@ services:
     ports:
       - "5432:5432"
     restart: always
+
+  application:
+    build: .
+    container_name: cash
+    environment:
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres/restaurant
+    depends_on:
+      postgres:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    restart: always
