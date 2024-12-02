@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование товара</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2c2f33; /* Темный фон */
+            color: #ffffff; /* Белый текст */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 20px;
+            background-color: #23272a; /* Темно-серый фон секций */
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-container, .menu-container {
+            width: 45%;
+            background-color: #2c2f33;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-container h2, .menu-container h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .form-container label,
+        .form-container input {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .form-container input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #3a3f44; /* Темная подложка */
+            color: #fff;
+        }
+
+        .form-container button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #ff6b6b; /* Красная кнопка */
+            color: #fff;
+        }
+
+        .form-container button:hover {
+            background-color: #ff4d4d;
+            transform: translateY(-2px);
+        }
+
+        .form-container button:active {
+            background-color: #e63939;
+            transform: translateY(1px);
+        }
+
+        .menu-container ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-container li {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.1em;
+            background-color: #3a3f44; /* Темная подложка */
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .menu-container form {
+            margin-top: 10px;
+        }
+
+        .menu-container button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .menu-container .edit-button {
+            background-color: #d4af37; /* Темно-желтая кнопка */
+        }
+
+        .menu-container .edit-button:hover {
+            background-color: #c7972b;
+        }
+
+        .menu-container .edit-button:active {
+            background-color: #b48f26;
+        }
+
+        .menu-container .delete-button {
+            background-color: #ff6b6b; /* Красная кнопка */
+        }
+
+        .menu-container .delete-button:hover {
+            background-color: #ff4d4d;
+        }
+
+        .menu-container .delete-button:active {
+            background-color: #e63939;
+        }
+
+        /* Стили для выравнивания кнопок "Удалить" и "Редактировать" на одной линии */
+        .menu-container .button-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .menu-container .button-container form {
+            display: inline-block;
+            margin: 0;
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-container">
+        <h2>Редактирование товара</h2>
+        <form th:action="@{/menu/edit/{id}(id=${item.getId()})}" method="POST">
+        <input type="hidden" name="id" th:value="${item.id}" /> <!-- Передача id товара -->
+            <label for="name">Название товара:</label>
+            <input type="text" id="name" name="name" th:value="${item.getName()}" required>
+            <br>
+            <label for="description">Описание:</label>
+            <input type="text" id="description" name="description" th:value="${item.getDescription()}" required>
+            <br>
+            <label for="count">Количество:</label>
+            <input type="number" id="count" name="count" th:value="${item.getCount()}" required>
+            <br>
+            <button type="submit">Обновить товар</button>
+        </form>
+
+    </div>
+
+    <div class="menu-container">
+        <h2>Список товаров</h2>
+        <ul>
+            <!-- Здесь будет список товаров -->
+            <th:block th:each="item : ${menuItems}">
+                <li>
+                    <strong>Название:</strong> <span th:text="${item.name}">Название товара</span><br>
+                    <strong>Описание:</strong> <span th:text="${item.description}">Описание</span><br>
+                    <strong>Кол-во:</strong> <span th:text="${item.count}">Количество</span><br>
+                    <div class="button-container">
+                        <form th:action="@{/menu/delete/{id}(id=${item.id})}" method="POST">
+                            <button type="submit" class="delete-button">Удалить</button>
+                        </form>
+                        <form th:action="@{/menu/edit/{id}(id=${item.id})}" method="GET">
+                            <button type="submit" class="edit-button">Редактировать</button>
+                        </form>
+                    </div>
+                </li>
+            </th:block>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

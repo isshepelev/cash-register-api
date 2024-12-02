@@ -146,15 +146,16 @@
         <h3>Добавленные заказы</h3>
         <div class="orders-table">
             <ul id="orderList">
-                <!-- Добавленные заказы будут появляться здесь -->
+                <!-- Использование Thymeleaf для отображения списка заказов -->
+                <li th:each="order : ${orders}" th:text="${order.name}"></li>
             </ul>
         </div>
         <!-- Кнопка создать заказ -->
         <button class="full-width-button">Создать заказ</button>
         <!-- Кнопки войти и сбросить -->
         <div class="action-buttons">
-            <button onclick="login()">Войти</button>
-            <button onclick="resetOrders()">Сбросить</button>
+            <button th:onclick="|login()|">Войти</button>
+            <button th:onclick="|resetOrders()|">Сбросить</button>
         </div>
     </div>
 
@@ -163,18 +164,18 @@
         <h3>Категории</h3>
         <table>
             <tr>
-                <td><button onclick="addOrder('Бургер')">Бургер</button></td>
-                <td><button onclick="addOrder('Пицца')">Пицца</button></td>
+                <td><button th:onclick="|addOrder('Бургер')|">Бургер</button></td>
+                <td><button th:onclick="|addOrder('Пицца')|">Пицца</button></td>
             </tr>
             <tr>
-                <td><button onclick="addOrder('Соус')">Соус</button></td>
-                <td><button onclick="addOrder('Роллы')">Роллы</button></td>
+                <td><button th:onclick="|addOrder('Соус')|">Соус</button></td>
+                <td><button th:onclick="|addOrder('Роллы')|">Роллы</button></td>
             </tr>
         </table>
         <!-- Кнопки навигации -->
         <div class="navigation-buttons">
-            <button onclick="prevPage()">Назад</button>
-            <button onclick="nextPage()">Вперед</button>
+            <button th:onclick="|prevPage()|">Назад</button>
+            <button th:onclick="|nextPage()|">Вперед</button>
         </div>
     </div>
 </div>
