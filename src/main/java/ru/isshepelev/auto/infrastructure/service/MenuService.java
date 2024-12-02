@@ -17,4 +17,6 @@ public interface MenuService {
     void deleteMenuItem(UUID id);
 
     Optional<Menu> findMenuById(UUID id);
+
+    List<Menu> getItems(int page, int pageSize);
 }

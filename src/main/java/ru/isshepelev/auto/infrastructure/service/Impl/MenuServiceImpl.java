@@ -3,11 +3,16 @@ package ru.isshepelev.auto.infrastructure.service.Impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepositroty;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 
 import java.util.List;
 import java.util.Optional;
@@ -68,5 +73,11 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public Optional<Menu> findMenuById(UUID id){
         return menuRepository.findById(id);
+    }
+    @Override
+    public List<Menu> getItems(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Menu> menuPage = menuRepository.findAll(pageable);
+        return menuPage.getContent();
     }
 }
