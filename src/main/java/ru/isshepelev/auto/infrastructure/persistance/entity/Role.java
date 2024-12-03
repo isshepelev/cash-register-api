@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class Role {
     private UUID id;
     private String role;
     @OneToMany(mappedBy = "role")
+    @ToString.Exclude
     private List<Employee> employees;
 
 }

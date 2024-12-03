@@ -27,12 +27,9 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .form-container, .menu-container {
-            width: 45%;
-            background-color: #2c2f33;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        .menu-container td form {
+            display: inline-block; /* Размещаем формы (кнопки) в одну строку */
+            margin-right: 5px; /* Добавляем отступ между кнопками */
         }
 
         .form-container h3, .menu-container h3 {
@@ -84,7 +81,7 @@
             border-collapse: collapse;
         }
 
-        .menu-container th,
+
         .menu-container td {
             padding: 12px;
             text-align: left;
@@ -252,6 +249,9 @@
                 <td>
                     <form th:action="@{'/employees/' + ${employee.id}}" method="post" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                    </form>
+                    <form th:action="@{'/employees/edit/' + ${employee.id}}" method="get" class="d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm">Редактировать</button>
                     </form>
                 </td>
             </tr>
