@@ -41,7 +41,7 @@ public class MenuController {
     public String editMenuItemForm(@PathVariable UUID id, Model model){
         model.addAttribute("menuItems", menuService.getAllMenuItems());
         model.addAttribute("item" , menuService.findMenuById(id).get());
-        return "edit";
+        return "edit-menu";
     }
 
     @PostMapping("/edit/{id}")
