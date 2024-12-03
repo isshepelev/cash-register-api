@@ -34,6 +34,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setName(employeeDto.getName());
         employee.setSurname(employeeDto.getSurname());
         employee.setPersonalCode(100 + new Random().nextInt(900));
+
+        while (findEmployeeByPersonalCode(employee.getPersonalCode()).isPresent()){
+            employee.setPersonalCode(100 + new Random().nextInt(900));
+        }
+
         employee.setRole(employeeDto.getRole());
         employee.setCashRegisterAccessible(employeeDto.isCashRegisterAccessible());
         employeeRepository.save(employee);
@@ -42,6 +47,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void deleteEmployeeById(UUID id){
         employeeRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Employee> findEmployeeByPersonalCode(int personalCode) {
+        return employeeRepository.findByPersonalCode(personalCode);
     }
 
 }

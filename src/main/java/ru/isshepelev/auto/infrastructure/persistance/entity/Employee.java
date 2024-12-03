@@ -1,7 +1,11 @@
 package ru.isshepelev.auto.infrastructure.persistance.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.util.UUID;
 
 @Data
@@ -14,9 +18,8 @@ public class Employee {
     private String name;
     private String surname;
     private int personalCode;
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id")
     private Role role;
     private boolean isCashRegisterAccessible;
-
-
 }

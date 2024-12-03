@@ -260,6 +260,10 @@
     </div>
 </div>
 
+<!--<div th:if="${error}" class="alert alert-danger" role="alert">-->
+<!--    <p th:text="${error}"></p>-->
+<!--</div>-->
+
 <!-- Вылазющее окно с ролями -->
 <div class="popup" id="rolesPopup">
     <div class="popup-content">
@@ -274,10 +278,13 @@
             <tbody>
             <tr th:each="role : ${roles}">
                 <td th:text="${role.role}">Администратор</td>
-                <td>
+                <td style="display: flex; align-items: center;">
                     <form th:action="@{'/employees/roles/delete/' + ${role.id}}" method="post">
                         <button type="submit" class="btn-danger">Удалить</button>
                     </form>
+                    <span th:if="${role.employees != null and role.employees.size() > 0}" style="color: red; margin-left: 10px;">
+            Невозможно удалить, должность используется
+        </span>
                 </td>
             </tr>
             </tbody>

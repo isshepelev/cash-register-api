@@ -156,6 +156,47 @@
             margin: 0 5px; /* Отступ между кнопками */
             background-color: #6c757d; /* Темная кнопка */
         }
+        /* Стили для всплывающего окна */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background-color: #3a3f44;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .popup input {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 80%;
+        }
+
+        .popup button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #ff6b6b;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #ff4d4d;
+        }
     </style>
 </head>
 <body>
@@ -171,7 +212,7 @@
         </div>
         <button class="full-width-button">Создать заказ</button>
         <div class="action-buttons">
-            <button th:onclick="|login()|">Войти</button>
+            <button onclick="openLoginPopup()">Войти</button>
             <button th:onclick="|resetOrders()|">Сбросить</button>
         </div>
     </div>
@@ -188,43 +229,84 @@
             <button id="nextBtn" onclick="loadItems(currentPage + 1)">Вперед</button>
         </div>
     </div>
+</div>
+<div class="popup" id="loginPopup">
+    <div class="popup-content">
+        <h3>Введите персональный код сотрудника</h3>
+        <input type="text" id="employeeCode" placeholder="Персональный код" />
+        <div>
+            <button onclick="loginEmployee()">Войти</button>
+            <button onclick="closeLoginPopup()">Отмена</button>
+        </div>
+        <p id="loginError" style="color: red; display: none;">У вас нет доступа к кассе.</p>
+    </div>
+</div>
 
-    <script>
-        let currentPage = 0;
+<script>
+    let currentPage = 0;
 
-        // Функция для загрузки товаров
-        function loadItems(page) {
-            if (page < 0) return; // Проверка, чтобы не уходить на отрицательные страницы
-            fetch(`/items/page/${page}`)
-                .then(response => response.json())
-                .then(data => {
-                    const itemsList = document.getElementById('items-list');
-                    itemsList.innerHTML = ''; // Очищаем текущий список товаров
-                    data.forEach(item => {
-                        const button = document.createElement('button');
-                        button.textContent = `${item.name} - ${item.description}`;
-                        button.onclick = () => addOrder(item);
-                        itemsList.appendChild(button);
-                    });
-
-                    currentPage = page;
-
-                    // Обновляем доступность кнопок
-                    document.getElementById('prevBtn').disabled = page === 0;
-                    document.getElementById('nextBtn').disabled = data.length < 5;
+    // Функция для загрузки товаров
+    function loadItems(page) {
+        if (page < 0) return; // Проверка, чтобы не уходить на отрицательные страницы
+        fetch(`/items/page/${page}`)
+            .then(response => response.json())
+            .then(data => {
+                const itemsList = document.getElementById('items-list');
+                itemsList.innerHTML = ''; // Очищаем текущий список товаров
+                data.forEach(item => {
+                    const button = document.createElement('button');
+                    button.textContent = `${item.name} - ${item.description}`;
+                    button.onclick = () => addOrder(item);
+                    itemsList.appendChild(button);
                 });
-        }
 
-        // Функция для добавления товара в список заказов
-        function addOrder(item) {
-            const orderList = document.getElementById('orderList');
-            const listItem = document.createElement('li');
-            listItem.textContent = `${item.name} - ${item.description} (${item.count} шт.)`;
-            orderList.appendChild(listItem);
-        }
+                currentPage = page;
 
-        // Загружаем товары при первой загрузке страницы
-        loadItems(currentPage);
-    </script>
+                // Обновляем доступность кнопок
+                document.getElementById('prevBtn').disabled = page === 0;
+                document.getElementById('nextBtn').disabled = data.length < 5;
+            });
+    }
+
+    // Функция для добавления товара в список заказов
+    function addOrder(item) {
+        const orderList = document.getElementById('orderList');
+        const listItem = document.createElement('li');
+        listItem.textContent = `${item.name} - ${item.description} (${item.count} шт.)`;
+        orderList.appendChild(listItem);
+    }
+
+    // Загружаем товары при первой загрузке страницы
+    loadItems(currentPage);
+    // Открыть всплывающее окно
+    function openLoginPopup() {
+        document.getElementById("loginPopup").style.display = "flex";
+    }
+
+    // Закрыть всплывающее окно
+    function closeLoginPopup() {
+        document.getElementById("loginPopup").style.display = "none";
+    }
+
+    // Проверка персонального кода
+    function loginEmployee() {
+        const employeeCode = document.getElementById("employeeCode").value;
+        // Отправка запроса на сервер для проверки кода сотрудника
+        fetch(`/check-access/${employeeCode}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.accessGranted) {
+                    // Успешный вход, можно продолжить с этим сотрудником
+                    window.location.href = "/dashboard";  // Пример редиректа
+                } else {
+                    document.getElementById("loginError").style.display = "block";  // Показать сообщение об ошибке
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка при проверке доступа:", error);
+                document.getElementById("loginError").style.display = "block";  // Показать сообщение об ошибке
+            });
+    }
+</script>
 </body>
 </html>

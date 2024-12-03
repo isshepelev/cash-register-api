@@ -18,4 +18,6 @@ public interface EmployeeService {
     void createEmployee(EmployeeCreateDto employeeDto);
 
     void deleteEmployeeById(UUID id);
+
+    Optional<Employee> findEmployeeByPersonalCode(int personalCode);
 }

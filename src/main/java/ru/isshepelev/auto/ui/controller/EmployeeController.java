@@ -44,10 +44,12 @@ public class EmployeeController {
     }
 
     @PostMapping("/roles/delete/{id}")
-    public String deleteRole(@PathVariable UUID id){
-        roleService.deletRoleById(id);
+    public String deleteRole(@PathVariable UUID id, RedirectAttributes redirectAttributes){
+        try {
+            roleService.deletRoleById(id);
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/employees";
     }
-
-
 }
