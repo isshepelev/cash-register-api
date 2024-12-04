@@ -7,3 +7,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  session:
+    timeout: 1m
+    store-type: redis
