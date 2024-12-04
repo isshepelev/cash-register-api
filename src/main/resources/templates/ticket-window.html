@@ -256,14 +256,12 @@
 <script>
     // Функция для создания заказа
     function createOrder() {
-        // Проверяем, авторизован ли сотрудник
         const employeeName = document.querySelector('span').textContent;
         if (!employeeName) {
             alert('Вы не авторизованы. Пожалуйста, войдите в систему.');
             return;
         }
 
-        // Проверяем, есть ли заказы в списке
         const orderList = document.querySelectorAll('#orderList li');
         if (orderList.length === 0) {
             alert('Список заказов пуст. Добавьте товары в заказ.');
@@ -283,15 +281,26 @@
             },
             body: JSON.stringify(orderItems)
         })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.text(); // Возвращаем текст для успешного ответа
+                } else {
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage); // Генерируем ошибку с текстом из ответа
+                    });
+                }
+            })
             .then(data => {
-                console.log("Ответ от сервера:", data);
-                window.location.href = "/"; // Редирект на главную страницу
+                alert(data); // Выводим сообщение об успешном создании
+                window.location.href = "/";
             })
             .catch(error => {
-                console.error("Ошибка при отправке данных:", error);
+                console.error("Ошибка:", error);
+                alert(error.message); // Показываем текст ошибки, отправленный сервером
             });
+
     }
+
 
 
     // Функция для сброса добавленных товаров

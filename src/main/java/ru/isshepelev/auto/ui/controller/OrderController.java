@@ -21,19 +21,16 @@ public class OrderController {
     @PostMapping("/create")
     public ResponseEntity<String> createOrder(@RequestBody List<UUID> orderItems, HttpSession session) {
         String employeeName = (String) session.getAttribute("employeeName");
+
         if (employeeName == null) {
+            System.out.println("Ошибка: сотрудник не авторизован.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не авторизованы.");
         }
-
         if (orderItems.isEmpty()) {
+            System.out.println("Ошибка: список заказов пуст.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Список заказов пуст.");
         }
-
-//        orderService.createOrder(orderItems);
-        System.out.println(orderItems);
-        System.out.println(employeeName);
-
-
+        //TODO создание заказа
         return ResponseEntity.ok("Заказ успешно создан.");
     }
 
