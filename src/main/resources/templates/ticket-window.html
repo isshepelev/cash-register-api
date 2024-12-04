@@ -221,7 +221,7 @@
                 <li th:each="order : ${orders}" th:text="${order.name}"></li>
             </ul>
         </div>
-        <button class="full-width-button">Создать заказ</button>
+        <button class="full-width-button" onclick="createOrder()">Создать заказ</button>
         <div class="action-buttons">
             <button onclick="openLoginPopup()">Войти</button>
             <button onclick="resetOrders()">Сбросить</button>
@@ -254,6 +254,35 @@
 </div>
 
 <script>
+    // Функция для создания заказа
+    function createOrder() {
+        const orderList = [];
+        const orderItems = document.querySelectorAll('#orderList li');
+
+        orderItems.forEach(item => {
+            // Извлекаем только ID товара
+            const itemId = item.getAttribute('data-id');
+            orderList.push(itemId); // Добавляем только ID в список
+        });
+
+        // Отправляем данные на сервер
+        fetch('/orders/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderList) // Отправляем только массив ID
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Ответ от сервера:", data);
+                window.location.href = "/"; // Редирект на главную страницу
+            })
+            .catch(error => {
+                console.error("Ошибка при отправке данных:", error);
+            });
+    }
+
     // Функция для сброса добавленных товаров
     function resetOrders() {
         const orderList = document.getElementById('orderList');
@@ -289,6 +318,7 @@
         const orderList = document.getElementById('orderList');
         const listItem = document.createElement('li');
         listItem.textContent = `${item.name} - ${item.description}`;
+        listItem.setAttribute('data-id', item.id); // Сохраняем ID товара
         orderList.appendChild(listItem);
     }
 
