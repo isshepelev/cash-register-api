@@ -1,6 +1,7 @@
 package ru.isshepelev.auto.ui.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,5 +49,24 @@ public class MenuController {
     public String editMenuItem(@PathVariable UUID id, @ModelAttribute MenuDto menuDto){
         menuService.updateMenuItem(id, menuDto);
         return "redirect:/menu";
+    }
+    @GetMapping("/stop-list")
+    public String stopList(Model model){
+        List<Menu> stopList = menuService.getAllMenuItems()
+                .stream()
+                .filter(e -> e.getCount() == 0)
+                .toList();
+        model.addAttribute("stopList", stopList);
+        return "stop-list";
+    }
+
+    @PostMapping("/stop-list")
+    @ResponseBody
+    public ResponseEntity<List<Menu>> stopList(){
+        List<Menu> stopList = menuService.getAllMenuItems()
+                .stream()
+                .filter(e -> e.getCount() == 0)
+                .toList();
+        return ResponseEntity.ok().body(stopList);
     }
 }

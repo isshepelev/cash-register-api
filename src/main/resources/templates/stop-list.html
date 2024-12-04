@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Стоп-лист</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2c2f33; /* Темный фон */
+            color: #ffffff; /* Белый текст */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            padding: 20px;
+            background-color: #23272a; /* Темно-серый фон */
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6b6b; /* Красный заголовок */
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #3a3f44;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ff6b6b; /* Красная шапка таблицы */
+            color: #ffffff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #444b52; /* Полосатая таблица */
+        }
+
+        tr:hover {
+            background-color: #555b61; /* Подсветка строки */
+        }
+
+        td {
+            border-bottom: 1px solid #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Стоп-лист</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Название</th>
+            <th>Описание</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Перебираем элементы из stopList -->
+        <tr th:each="menuItem : ${stopList}">
+            <td th:text="${menuItem.name}">Название блюда</td>
+            <td th:text="${menuItem.description}">Описание блюда</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

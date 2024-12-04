@@ -1,8 +1,6 @@
 package ru.isshepelev.auto.infrastructure.persistance.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
@@ -19,5 +17,12 @@ public class Menu {
     private String name;
     private String description;
     private int count;
+    @PrePersist
+    @PreUpdate
+    private void ensureNonNegativeCount() {
+        if (this.count < 0) {
+            this.count = 0;
+        }
+    }
 
 }

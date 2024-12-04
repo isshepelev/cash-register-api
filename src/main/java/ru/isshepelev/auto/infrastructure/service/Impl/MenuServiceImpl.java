@@ -50,6 +50,11 @@ public class MenuServiceImpl implements MenuService {
             Menu menu = menuOptional.get();
             menu.setName(menuDto.getName());
             menu.setDescription(menuDto.getDescription());
+
+            if (menuDto.getCount() < 0){
+                menu.setCount(0);
+            }
+
             menu.setCount(menuDto.getCount());
             log.info("изменение товара {} ", menu);
             menuRepository.save(menu);
