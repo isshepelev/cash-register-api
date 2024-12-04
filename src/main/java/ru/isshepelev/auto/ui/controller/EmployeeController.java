@@ -1,15 +1,21 @@
 package ru.isshepelev.auto.ui.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.isshepelev.auto.infrastructure.persistance.entity.Employee;
 import ru.isshepelev.auto.infrastructure.service.EmployeeService;
 import ru.isshepelev.auto.infrastructure.service.RoleService;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeCreateDto;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeEditDto;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -66,6 +72,22 @@ public class EmployeeController {
     public String editEmployee(@PathVariable UUID id, @ModelAttribute EmployeeEditDto employeeEditDto){
         employeeService.update(id, employeeEditDto);
         return "redirect:/employees";
+    }
+    @PostMapping("/check-access/{employeeCode}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkAccess(@PathVariable int employeeCode, HttpSession session) {
+        Optional<Employee> employeeOpt = employeeService.findEmployeeByPersonalCode(employeeCode);
+
+        Map<String, Object> response = new HashMap<>();
+        if (employeeOpt.isPresent() && employeeOpt.get().isCashRegisterAccessible()) {
+            // Сохраняем имя и фамилию сотрудника в сессии
+            session.setAttribute("employeeName", employeeOpt.get().getName() + " " + employeeOpt.get().getSurname());
+            response.put("accessGranted", true);
+        } else {
+            response.put("accessGranted", false);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
 }

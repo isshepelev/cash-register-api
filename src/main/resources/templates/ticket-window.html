@@ -211,6 +211,9 @@
 <div class="container">
     <!-- Левая секция -->
     <div class="orders-section">
+        <div class="header">
+            <span th:text="${session.employeeName}"></span> <!-- Отображение имени сотрудника -->
+        </div>
         <h3>Добавленные заказы</h3>
         <div class="orders-table">
             <ul id="orderList">
@@ -221,7 +224,7 @@
         <button class="full-width-button">Создать заказ</button>
         <div class="action-buttons">
             <button onclick="openLoginPopup()">Войти</button>
-            <button th:onclick="|resetOrders()|">Сбросить</button>
+            <button onclick="resetOrders()">Сбросить</button>
         </div>
     </div>
 
@@ -251,6 +254,11 @@
 </div>
 
 <script>
+    // Функция для сброса добавленных товаров
+    function resetOrders() {
+        const orderList = document.getElementById('orderList');
+        orderList.innerHTML = '';  // Очищаем список заказов
+    }
     let currentPage = 0;
 
     // Функция для загрузки товаров
@@ -299,13 +307,16 @@
     // Проверка персонального кода
     function loginEmployee() {
         const employeeCode = document.getElementById("employeeCode").value;
+
         // Отправка запроса на сервер для проверки кода сотрудника
-        fetch(`/check-access/${employeeCode}`)
+        fetch(`/employees/check-access/${employeeCode}`, {
+            method: 'POST'
+        })
             .then(response => response.json())
             .then(data => {
                 if (data.accessGranted) {
                     // Успешный вход, можно продолжить с этим сотрудником
-                    window.location.href = "/dashboard";  // Пример редиректа
+                    window.location.href = "/";  // Пример редиректа
                 } else {
                     document.getElementById("loginError").style.display = "block";  // Показать сообщение об ошибке
                 }
