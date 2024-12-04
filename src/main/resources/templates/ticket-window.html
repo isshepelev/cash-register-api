@@ -256,22 +256,32 @@
 <script>
     // Функция для создания заказа
     function createOrder() {
-        const orderList = [];
-        const orderItems = document.querySelectorAll('#orderList li');
+        // Проверяем, авторизован ли сотрудник
+        const employeeName = document.querySelector('span').textContent;
+        if (!employeeName) {
+            alert('Вы не авторизованы. Пожалуйста, войдите в систему.');
+            return;
+        }
 
-        orderItems.forEach(item => {
-            // Извлекаем только ID товара
+        // Проверяем, есть ли заказы в списке
+        const orderList = document.querySelectorAll('#orderList li');
+        if (orderList.length === 0) {
+            alert('Список заказов пуст. Добавьте товары в заказ.');
+            return;
+        }
+
+        const orderItems = [];
+        orderList.forEach(item => {
             const itemId = item.getAttribute('data-id');
-            orderList.push(itemId); // Добавляем только ID в список
+            orderItems.push(itemId); // Добавляем только ID в список
         });
 
-        // Отправляем данные на сервер
         fetch('/orders/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(orderList) // Отправляем только массив ID
+            body: JSON.stringify(orderItems)
         })
             .then(response => response.json())
             .then(data => {
@@ -282,6 +292,7 @@
                 console.error("Ошибка при отправке данных:", error);
             });
     }
+
 
     // Функция для сброса добавленных товаров
     function resetOrders() {
@@ -356,6 +367,24 @@
                 document.getElementById("loginError").style.display = "block";  // Показать сообщение об ошибке
             });
     }
+    fetch('/orders/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderItems)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                window.location.href = "/"; // Редирект на главную страницу
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка при отправке данных:", error);
+        });
 </script>
 </body>
 </html>

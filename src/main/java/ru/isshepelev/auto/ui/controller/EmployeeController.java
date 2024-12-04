@@ -80,7 +80,6 @@ public class EmployeeController {
 
         Map<String, Object> response = new HashMap<>();
         if (employeeOpt.isPresent() && employeeOpt.get().isCashRegisterAccessible()) {
-            // Сохраняем имя и фамилию сотрудника в сессии
             session.setAttribute("employeeName", employeeOpt.get().getName() + " " + employeeOpt.get().getSurname());
             response.put("accessGranted", true);
         } else {
