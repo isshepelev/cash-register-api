@@ -19,4 +19,6 @@ public interface MenuService {
     Optional<Menu> findMenuById(UUID id);
 
     List<Menu> getItems(int page, int pageSize);
+
+    List<Menu> getStopList();
 }

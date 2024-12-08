@@ -11,8 +11,6 @@ import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 
 import java.util.List;
 import java.util.Optional;
@@ -84,5 +82,12 @@ public class MenuServiceImpl implements MenuService {
         Pageable pageable = PageRequest.of(page, pageSize);
         Page<Menu> menuPage = menuRepository.findAll(pageable);
         return menuPage.getContent();
+    }
+
+    @Override
+    public List<Menu> getStopList(){
+        return getAllMenuItems().stream()
+                .filter(e -> e.getCount() == 0)
+                .toList();
     }
 }

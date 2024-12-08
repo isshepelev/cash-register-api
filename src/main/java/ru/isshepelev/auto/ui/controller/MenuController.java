@@ -52,10 +52,7 @@ public class MenuController {
     }
     @GetMapping("/stop-list")
     public String stopList(Model model){
-        List<Menu> stopList = menuService.getAllMenuItems()
-                .stream()
-                .filter(e -> e.getCount() == 0)
-                .toList();
+        List<Menu> stopList = menuService.getStopList();
         model.addAttribute("stopList", stopList);
         return "stop-list";
     }
