@@ -8,5 +8,10 @@ spring:
     hibernate:
       ddl-auto: update
   session:
-    timeout: 1m
+    timeout: 100m
     store-type: redis
+  kafka:
+    bootstrap-servers: kafka:9092 #localhost:9092 kafka:9092
+  redis:
+    host: redis
+    port: 6379
