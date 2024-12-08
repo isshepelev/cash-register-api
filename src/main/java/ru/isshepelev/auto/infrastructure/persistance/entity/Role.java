@@ -9,12 +9,13 @@ import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @Entity
-public class Role {
+public class Role implements  Serializable {
     @Id
     private UUID id;
     private String role;

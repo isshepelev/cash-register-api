@@ -5,6 +5,6 @@ public enum OrderStatus {
     IN_PROGRESS,
     ERROR,
     CREATION,
-    OOKING_COMPLETED
+    СOOKING_COMPLETED
 
 }

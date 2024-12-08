@@ -6,31 +6,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import ru.isshepelev.auto.infrastructure.kafka.Producer;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
+import ru.isshepelev.auto.infrastructure.service.OrderService;
 
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
-
-    private final MenuService menuService;
+    private final Producer producer;
 
     @PostMapping("/create")
     public ResponseEntity<String> createOrder(@RequestBody List<UUID> orderItems, HttpSession session) {
         String employeeName = (String) session.getAttribute("employeeName");
 
         if (employeeName == null) {
-            System.out.println("Ошибка: сотрудник не авторизован.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не авторизованы.");
         }
         if (orderItems.isEmpty()) {
-            System.out.println("Ошибка: список заказов пуст.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Список заказов пуст.");
         }
-        //TODO создание заказа
+        producer.sendOrder(orderItems);
         return ResponseEntity.ok("Заказ успешно создан.");
     }
 
