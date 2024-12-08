@@ -29,7 +29,7 @@ public class OrderController {
         if (orderItems.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Список заказов пуст.");
         }
-        producer.sendOrder(orderItems);
+        producer.sendOrder(orderItems); //TODO передавать сам заказ с статусом в процессе и списком товаров
         return ResponseEntity.ok("Заказ успешно создан.");
     }
 

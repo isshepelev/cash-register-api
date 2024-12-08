@@ -9,6 +9,7 @@ import ru.isshepelev.auto.infrastructure.service.OrderService;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -17,9 +18,10 @@ public class Consumer {
     private final OrderService orderService;
 
     @KafkaListener(topics = "order", groupId = "1")
-    @SneakyThrows
-    public void orderListener(List<UUID> idOrders){
-        System.out.println(idOrders);
-        orderService.createNewOrder(idOrders);
+    public void orderListener(List<String> idOrders) {
+        List<UUID> orderUUIDs = idOrders.stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList());
+        orderService.createNewOrder(orderUUIDs);
     }
 }

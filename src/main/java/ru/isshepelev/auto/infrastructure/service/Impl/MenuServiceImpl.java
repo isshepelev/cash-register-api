@@ -90,4 +90,21 @@ public class MenuServiceImpl implements MenuService {
                 .filter(e -> e.getCount() == 0)
                 .toList();
     }
+    @Override
+    @Transactional
+    public void updateMenuItems(List<Menu> menuList){
+        if (menuList == null || menuList.isEmpty()) {
+            return;
+        }
+        menuList.forEach(menu -> {
+            Optional<Menu> existingMenu = menuRepository.findById(menu.getId());
+            if (existingMenu.isPresent()) {
+                Menu updatedMenu = existingMenu.get();
+                updatedMenu.setName(menu.getName());
+                updatedMenu.setDescription(menu.getDescription());
+                updatedMenu.setCount(menu.getCount());
+                menuRepository.save(updatedMenu);
+            }
+        });
+    }
 }

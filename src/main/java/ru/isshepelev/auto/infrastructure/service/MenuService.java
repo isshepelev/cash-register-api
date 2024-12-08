@@ -1,5 +1,6 @@
 package ru.isshepelev.auto.infrastructure.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
@@ -21,4 +22,7 @@ public interface MenuService {
     List<Menu> getItems(int page, int pageSize);
 
     List<Menu> getStopList();
+
+    @Transactional
+    void updateMenuItems(List<Menu> menuList);
 }
