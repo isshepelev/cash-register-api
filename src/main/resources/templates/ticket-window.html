@@ -270,8 +270,13 @@
 
         const orderItems = [];
         orderList.forEach(item => {
-            const itemId = item.getAttribute('data-id');
-            orderItems.push(itemId); // Добавляем только ID в список
+            const menuItem = {
+                id: item.getAttribute('data-id'),
+                name: item.getAttribute('data-name'),
+                description: item.getAttribute('data-description'),
+                count: parseInt(item.getAttribute('data-count'), 10)
+            };
+            orderItems.push(menuItem);
         });
 
         fetch('/orders/create', {
@@ -281,24 +286,15 @@
             },
             body: JSON.stringify(orderItems)
         })
-            .then(response => {
-                if (response.ok) {
-                    return response.text(); // Возвращаем текст для успешного ответа
-                } else {
-                    return response.text().then(errorMessage => {
-                        throw new Error(errorMessage); // Генерируем ошибку с текстом из ответа
-                    });
-                }
-            })
+            .then(response => response.text())
             .then(data => {
-                alert(data); // Выводим сообщение об успешном создании
+                alert(data);
                 window.location.href = "/";
             })
             .catch(error => {
                 console.error("Ошибка:", error);
-                alert(error.message); // Показываем текст ошибки, отправленный сервером
+                alert(error.message);
             });
-
     }
 
 
@@ -338,7 +334,10 @@
         const orderList = document.getElementById('orderList');
         const listItem = document.createElement('li');
         listItem.textContent = `${item.name} - ${item.description}`;
-        listItem.setAttribute('data-id', item.id); // Сохраняем ID товара
+        listItem.setAttribute('data-id', item.id);
+        listItem.setAttribute('data-name', item.name);
+        listItem.setAttribute('data-description', item.description);
+        listItem.setAttribute('data-count', item.count);
         orderList.appendChild(listItem);
     }
 

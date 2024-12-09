@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import ru.isshepelev.auto.infrastructure.persistance.entity.Order;
 import ru.isshepelev.auto.infrastructure.service.OrderService;
 
 import java.util.List;
@@ -18,10 +19,7 @@ public class Consumer {
     private final OrderService orderService;
 
     @KafkaListener(topics = "order", groupId = "1")
-    public void orderListener(List<String> idOrders) {
-        List<UUID> orderUUIDs = idOrders.stream()
-                .map(UUID::fromString)
-                .collect(Collectors.toList());
-        orderService.createNewOrder(orderUUIDs);
+    public void orderListener(Order order) {
+        orderService.processingOrder(order);
     }
 }

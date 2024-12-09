@@ -1,6 +1,7 @@
 package ru.isshepelev.auto.infrastructure.service;
 
 import org.springframework.stereotype.Service;
+import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Order;
 
 import java.util.List;
@@ -14,5 +15,7 @@ public interface OrderService {
 
     Optional<Order> getOrderById(UUID id);
 
-    void createNewOrder(List<UUID> idOrderItems);
+    Order createNewOrder(List<Menu> itemsList);
+
+    void processingOrder(Order orderCreate);
 }

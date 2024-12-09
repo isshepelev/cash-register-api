@@ -1,7 +1,7 @@
 package ru.isshepelev.auto.infrastructure.service.Impl;
 
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Order;
@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +34,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void createNewOrder(List<UUID> idOrderItems) {
+    public Order createNewOrder(List<Menu> itemsList){
+        List<Menu> menuList = new ArrayList<>();
+        itemsList.forEach(item -> {
+            Menu menu = new Menu();
+            menu.setId(item.getId());
+            menu.setName(item.getName());
+            menu.setDescription(item.getDescription());
+            menu.setCount(item.getCount());
+            menuList.add(menu);
+        });
+        Order order = new Order(UUID.randomUUID(), LocalDate.now().atStartOfDay(), OrderStatus.CREATION, menuList);
+        orderRepository.save(order);
+        return order;
+    }
+
+    @Override
+    @SneakyThrows
+    public void processingOrder(Order orderCreate) {
         List<Menu> menuItems = menuService.getAllMenuItems();
-        List<Menu> selectedItems = menuItems.stream().filter(menu -> idOrderItems.contains(menu.getId())).toList();
+        List<Menu> selectedItems = menuItems.stream().filter(menu -> orderCreate.getMenuList().contains(menu)).toList();
         List<Menu> stopList = selectedItems.stream().filter(menu -> menu.getCount() == 0).toList();
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setDate(LocalDate.now().atStartOfDay());
-        order.setMenuList(selectedItems);
+
+        Order order = orderRepository.findById(orderCreate.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
 
         if (!stopList.isEmpty()) {
             order.setStatus(OrderStatus.ERROR);

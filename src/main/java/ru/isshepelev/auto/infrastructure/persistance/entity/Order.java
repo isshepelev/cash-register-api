@@ -1,7 +1,9 @@
 package ru.isshepelev.auto.infrastructure.persistance.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.isshepelev.auto.infrastructure.persistance.entity.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -9,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "orders")
 public class Order {
