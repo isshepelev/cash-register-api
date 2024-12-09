@@ -14,6 +14,9 @@ public interface MenuService {
 
     List<Menu> getAllMenuItems();
     void createMenuItem(MenuDto menuDto);
+
+    void createNewMenu(List<MenuDto> menuDtoList);
+
     void updateMenuItem(UUID id, MenuDto menuDto);
     void deleteMenuItem(UUID id);
 

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание меню</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+        .form-container {
+            width: 45%;
+        }
+        .list-container {
+            width: 45%;
+        }
+        .form-container, .list-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .menu-item {
+            margin: 5px 0;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Левая часть - форма добавления элемента -->
+    <div class="form-container">
+        <h2>Добавить элемент в меню</h2>
+        <form id="menu-form">
+            <div>
+                <label for="name">Название:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="description">Описание:</label>
+                <input type="text" id="description" name="description" required>
+            </div>
+            <div>
+                <label for="count">Количество:</label>
+                <input type="number" id="count" name="count" required>
+            </div>
+            <button type="button" id="add-item">Добавить в список</button>
+        </form>
+    </div>
+
+    <!-- Правая часть - список элементов -->
+    <div class="list-container">
+        <h2>Список меню</h2>
+        <ul id="menu-items">
+            <!-- Элементы будут добавляться сюда динамически -->
+        </ul>
+
+        <form id="create-menu-form" action="/menu/create" method="POST">
+            <input type="hidden" name="menuData" id="menuData">
+            <button type="submit">Создать меню</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const addItemButton = document.getElementById('add-item');
+    const menuForm = document.getElementById('menu-form');
+    const menuItemsList = document.getElementById('menu-items');
+    const createMenuForm = document.getElementById('create-menu-form');
+
+    // Массив для хранения добавленных элементов
+    let menuItems = [];
+
+    // Функция для добавления элемента в список
+    addItemButton.addEventListener('click', () => {
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const count = document.getElementById('count').value;
+
+        // Проверка на заполненность всех полей
+        if (name && description && count) {
+            const menuItem = { name, description, count };
+
+            // Добавление элемента в массив
+            menuItems.push(menuItem);
+
+            // Добавление элемента в DOM
+            const listItem = document.createElement('li');
+            listItem.classList.add('menu-item');
+            listItem.textContent = `${name} - ${description} - ${count}`;
+            menuItemsList.appendChild(listItem);
+
+            // Очищаем форму
+            menuForm.reset();
+        } else {
+            alert('Пожалуйста, заполните все поля!');
+        }
+    });
+
+    // Функция для отправки меню
+    createMenuForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Отправка данных на сервер в формате JSON
+        fetch('/menu/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(menuItems)  // Отправляем массив menuItems как JSON
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Перенаправляем на главную страницу
+                    window.location.href = '/';
+                } else {
+                    return response.json().then(error => {
+                        console.error('Ошибка при создании меню:', error);
+                        alert('Не удалось создать меню. Попробуйте снова.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при создании меню:', error);
+                alert('Не удалось создать меню. Попробуйте снова.');
+            });
+    });
+</script>
+
+</body>
+</html>

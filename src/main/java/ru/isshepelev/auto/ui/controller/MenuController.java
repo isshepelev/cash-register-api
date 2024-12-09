@@ -1,6 +1,7 @@
 package ru.isshepelev.auto.ui.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +11,7 @@ import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
 
 import java.awt.*;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -26,10 +28,21 @@ public class MenuController {
         return "menu";
     }
 
+    @GetMapping("/create")
+    public String viewCreateMenu(){
+        return "create-menu";
+    }
+    @PostMapping("/create")
+    public ResponseEntity<Void> createNewMenu(@RequestBody List<MenuDto> menuDto) {
+        menuService.createNewMenu(menuDto);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/"))
+                .build();
+    }
+
     @PostMapping("/add")
     public String addMenuItem(@RequestParam String name, @RequestParam String description, @RequestParam int count) {
-        MenuDto menuDto = new MenuDto(name, description, count);
-        menuService.createMenuItem(menuDto);
+        menuService.createMenuItem(new MenuDto(name, description, count));
         return "redirect:/menu";
     }
 

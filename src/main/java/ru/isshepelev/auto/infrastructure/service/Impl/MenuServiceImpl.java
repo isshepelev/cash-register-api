@@ -6,12 +6,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
+import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
+import ru.isshepelev.auto.infrastructure.persistance.entity.enums.StatusRevision;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepositroty;
+import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRevisionRepository;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +27,8 @@ import java.util.UUID;
 public class MenuServiceImpl implements MenuService {
 
     private final MenuRepositroty menuRepository;
+    private final MenuRevisionRepository menuRevisionRepository;
+
 
     @Override
     public List<Menu> getAllMenuItems() {
@@ -38,6 +45,25 @@ public class MenuServiceImpl implements MenuService {
         menu.setCount(menuDto.getCount());
         log.info("добавление товара{} ", menu);
         menuRepository.save(menu);
+    }
+    @Override
+    public void createNewMenu(List<MenuDto> menuDtoList){
+        List<Menu> menuList = new ArrayList<>();
+        for (MenuDto dto : menuDtoList){
+            Menu menu = new Menu();
+            menu.setId(UUID.randomUUID());
+            menu.setName(dto.getName());
+            menu.setCount(dto.getCount());
+            menu.setDescription(dto.getDescription());
+            menuList.add(menu);
+        }
+        MenuRevision revision = new MenuRevision();
+        revision.setDateOfCreate(LocalDate.now());
+        revision.setStatus(StatusRevision.USED);
+        revision.setRevision(menuList);
+        menuRepository.saveAll(menuList);
+        menuRevisionRepository.save(revision);
+
     }
 
     @Override
@@ -64,14 +90,6 @@ public class MenuServiceImpl implements MenuService {
     public void deleteMenuItem(UUID id) {
         log.info("удаление товара {} ", menuRepository.findById(id));
         menuRepository.deleteById(id);
-    }
-
-    private MenuDto convertToDto(Menu menu) {
-        MenuDto menuDto = new MenuDto();
-        menuDto.setName(menu.getName());
-        menuDto.setDescription(menu.getDescription());
-        menuDto.setCount(menu.getCount());
-        return menuDto;
     }
     @Override
     public Optional<Menu> findMenuById(UUID id){
