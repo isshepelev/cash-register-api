@@ -9,6 +9,7 @@ import ru.isshepelev.auto.infrastructure.persistance.entity.enums.OrderStatus;
 import ru.isshepelev.auto.infrastructure.persistance.repository.OrderRepository;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.OrderService;
+import ru.isshepelev.auto.infrastructure.service.dto.OrderMenuDto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,13 +36,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createNewOrder(List<Menu> itemsList){
-        List<Menu> menuList = new ArrayList<>();
+        List<OrderMenuDto> menuList = new ArrayList<>();
         itemsList.forEach(item -> {
-            Menu menu = new Menu();
+            OrderMenuDto menu = new OrderMenuDto();
             menu.setId(item.getId());
             menu.setName(item.getName());
             menu.setDescription(item.getDescription());
-            menu.setCount(item.getCount());
             menuList.add(menu);
         });
         Order order = new Order(UUID.randomUUID(), LocalDate.now().atStartOfDay(), OrderStatus.CREATION, menuList);
@@ -50,11 +50,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @SneakyThrows
     public void processingOrder(Order orderCreate) {
         List<Menu> menuItems = menuService.getAllMenuItems();
-        List<Menu> selectedItems = menuItems.stream().filter(menu -> orderCreate.getMenuList().contains(menu)).toList();
-        List<Menu> stopList = selectedItems.stream().filter(menu -> menu.getCount() == 0).toList();
+        List<Menu> selectedItems = menuItems.stream()
+                .filter(menu -> orderCreate.getMenuList().stream()
+                        .anyMatch(orderMenuDto -> orderMenuDto.getId().equals(menu.getId())))
+                .toList();
+        List<Menu> stopList = selectedItems.stream()
+                .filter(menu -> menu.getCount() == 0)
+                .toList();
 
         Order order = orderRepository.findById(orderCreate.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
@@ -68,7 +72,12 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.СOOKING_COMPLETED);
         orderRepository.save(order);
 
-        selectedItems.forEach(menu -> menu.setCount(menu.getCount() - 1));
+        selectedItems.forEach(menu -> {
+            long countInOrder = orderCreate.getMenuList().stream()
+                    .filter(orderMenuDto -> orderMenuDto.getId().equals(menu.getId()))
+                    .count();
+            menu.setCount(menu.getCount() - (int) countInOrder);
+        });
         menuService.updateMenuItems(selectedItems);
     }
 }
