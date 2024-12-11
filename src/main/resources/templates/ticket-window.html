@@ -210,6 +210,7 @@
 <body>
 <div class="container">
     <!-- Левая секция -->
+
     <div class="orders-section">
         <div class="header">
             <span th:text="${session.employeeName}"></span> <!-- Отображение имени сотрудника -->
@@ -230,6 +231,12 @@
 
     <!-- Правая секция -->
     <div class="categories-section">
+        <h3>Ревизии меню</h3>
+        <select id="revisionSelect" onchange="loadItemsFromRevision()">
+            <option value="">Выберите ревизию</option>
+            <!-- Отображаем список доступных ревизий -->
+            <option th:each="revision : ${revisions}" th:value="${revision.id}" th:text="'Ревизия от ' + ${revision.dateOfCreate}"></option>
+        </select>
         <h3>Категории</h3>
         <div id="items-list">
             <!-- Товары будут загружаться сюда как кнопки -->
@@ -254,6 +261,23 @@
 </div>
 
 <script>
+    let currentPage = 0;
+    let currentRevisionId = null;
+
+    // Функция для загрузки товаров из выбранной ревизии
+    function loadItemsFromRevision() {
+        const revisionId = document.getElementById("revisionSelect").value;
+        console.log("Выбрана ревизия с ID:", revisionId); // Логируем выбранный ID
+
+        // Если ревизия не выбрана, выводим сообщение и прекращаем выполнение
+        if (!revisionId) {
+            console.log("Ревизия не выбрана.");
+            return;
+        }
+
+        currentRevisionId = revisionId;
+        loadItems(currentPage); // Загружаем товары с выбранной ревизией
+    }
     // Функция для создания заказа
     function createOrder() {
         const employeeName = document.querySelector('span').textContent;
@@ -304,12 +328,19 @@
         const orderList = document.getElementById('orderList');
         orderList.innerHTML = '';  // Очищаем список заказов
     }
-    let currentPage = 0;
 
     // Функция для загрузки товаров
     function loadItems(page) {
         if (page < 0) return; // Проверка, чтобы не уходить на отрицательные страницы
-        fetch(`/items/page/${page}`)
+
+        // Формируем URL для запроса с параметром revisionId
+        const url = currentRevisionId
+            ? `/items/page/${page}?revisionId=${currentRevisionId}`
+            : `/items/page/${page}`;
+
+        console.log("Запрашиваем URL:", url); // Логируем URL
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 const itemsList = document.getElementById('items-list');
@@ -340,6 +371,9 @@
         listItem.setAttribute('data-count', item.count);
         orderList.appendChild(listItem);
     }
+
+    // Загружаем товары при первой загрузке страницы
+    loadItems(currentPage);
 
     // Загружаем товары при первой загрузке страницы
     loadItems(currentPage);

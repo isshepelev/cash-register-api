@@ -3,6 +3,7 @@ package ru.isshepelev.auto.infrastructure.service;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
+import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
 
 import java.util.List;
@@ -23,6 +24,10 @@ public interface MenuService {
     Optional<Menu> findMenuById(UUID id);
 
     List<Menu> getItems(int page, int pageSize);
+
+    List<MenuRevision> getAllRevisions();
+
+    List<Menu> getMenuFromRevision(Long revisionId);
 
     List<Menu> getStopList();
 

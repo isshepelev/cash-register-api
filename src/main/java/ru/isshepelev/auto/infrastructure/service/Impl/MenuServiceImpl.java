@@ -3,7 +3,6 @@ package ru.isshepelev.auto.infrastructure.service.Impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
@@ -12,14 +11,9 @@ import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepositroty;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRevisionRepository;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -97,9 +91,28 @@ public class MenuServiceImpl implements MenuService {
     }
     @Override
     public List<Menu> getItems(int page, int pageSize) {
-        Pageable pageable = PageRequest.of(page, pageSize);
-        Page<Menu> menuPage = menuRepository.findAll(pageable);
-        return menuPage.getContent();
+        MenuRevision currentRevision = menuRevisionRepository.findTopByOrderByDateOfCreateDesc();
+
+        if (currentRevision != null) {
+            List<Menu> revisionMenu = currentRevision.getRevision();
+            int start = page * pageSize;
+            int end = Math.min((start + pageSize), revisionMenu.size());
+            return revisionMenu.subList(start, end);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+    @Override
+    public List<MenuRevision> getAllRevisions() {
+        return menuRevisionRepository.findAll();
+    }
+    @Override
+    public List<Menu> getMenuFromRevision(Long revisionId) {
+        Optional<MenuRevision> revisionOptional = menuRevisionRepository.findById(revisionId);
+        if (revisionOptional.isPresent()) {
+            return revisionOptional.get().getRevision();
+        }
+        return Collections.emptyList();
     }
 
     @Override

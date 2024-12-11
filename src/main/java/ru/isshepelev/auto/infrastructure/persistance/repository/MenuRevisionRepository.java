@@ -9,5 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface MenuRevisionRepository extends JpaRepository<MenuRevision, Long> {
+    MenuRevision findTopByOrderByDateOfCreateDesc();
 
 }
