@@ -90,13 +90,23 @@ public class MenuServiceImpl implements MenuService {
         return menuRepository.findById(id);
     }
     @Override
-    public List<Menu> getItems(int page, int pageSize) {
-        MenuRevision currentRevision = menuRevisionRepository.findTopByOrderByDateOfCreateDesc();
+    @Transactional
+    public List<Menu> getItems(int page, int pageSize, Long revisionId) {
+        MenuRevision currentRevision = null;
+
+        if (revisionId != null) {
+            Optional<MenuRevision> revisionOptional = menuRevisionRepository.findById(revisionId);
+            if (revisionOptional.isPresent()) {
+                currentRevision = revisionOptional.get();
+            }
+        } else {
+            currentRevision = menuRevisionRepository.findTopByOrderByDateOfCreateDesc();
+        }
 
         if (currentRevision != null) {
             List<Menu> revisionMenu = currentRevision.getRevision();
             int start = page * pageSize;
-            int end = Math.min((start + pageSize), revisionMenu.size());
+            int end = Math.min(start + pageSize, revisionMenu.size());
             return revisionMenu.subList(start, end);
         } else {
             return Collections.emptyList();

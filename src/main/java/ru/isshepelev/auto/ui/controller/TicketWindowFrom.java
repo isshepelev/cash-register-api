@@ -29,10 +29,6 @@ public class TicketWindowFrom {
     @ResponseBody
     public List<Menu> getItems(@PathVariable int page, @RequestParam(required = false) Long revisionId) {
         int pageSize = 5;
-        if (revisionId != null) {
-            return menuService.getMenuFromRevision(revisionId);
-        } else {
-            return menuService.getItems(page, pageSize);
-        }
+        return menuService.getItems(page, pageSize, revisionId);
     }
 }

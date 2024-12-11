@@ -23,7 +23,8 @@ public interface MenuService {
 
     Optional<Menu> findMenuById(UUID id);
 
-    List<Menu> getItems(int page, int pageSize);
+    @Transactional
+    List<Menu> getItems(int page, int pageSize, Long revisionId);
 
     List<MenuRevision> getAllRevisions();
 
