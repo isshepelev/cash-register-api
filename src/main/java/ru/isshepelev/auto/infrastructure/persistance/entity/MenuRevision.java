@@ -2,7 +2,6 @@ package ru.isshepelev.auto.infrastructure.persistance.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import ru.isshepelev.auto.infrastructure.persistance.entity.enums.StatusRevision;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,9 +14,8 @@ public class MenuRevision {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private LocalDate dateOfCreate;
-    private StatusRevision status;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<Menu> revision;
 
 }

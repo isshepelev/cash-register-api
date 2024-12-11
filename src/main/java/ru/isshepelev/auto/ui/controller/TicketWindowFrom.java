@@ -24,11 +24,23 @@ public class TicketWindowFrom {
         model.addAttribute("currentPage", 0);
         return "ticket-window";
     }
+    @PostMapping("/select-revision")
+    public String selectRevision(@RequestParam Long revisionId, Model model) {
+        menuService.getMenuFromRevision(revisionId);
+        List<MenuRevision> revisions = menuService.getAllRevisions();
+        model.addAttribute("revisions", revisions);
+        model.addAttribute("currentPage", 0);
+        return "ticket-window";
+    }
 
     @GetMapping("/items/page/{page}")
     @ResponseBody
     public List<Menu> getItems(@PathVariable int page, @RequestParam(required = false) Long revisionId) {
         int pageSize = 5;
-        return menuService.getItems(page, pageSize, revisionId);
+        if (revisionId != null) {
+            return menuService.getMenuFromRevision(revisionId);
+        } else {
+            return menuService.getItems(page, pageSize);
+        }
     }
 }

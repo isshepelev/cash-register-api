@@ -13,6 +13,12 @@ import java.util.UUID;
 @Service
 public interface MenuService {
 
+    MenuRevision getActiveRevision();
+
+    void setActiveRevision(MenuRevision revision);
+
+    List<Menu> getItems(int page, int pageSize);
+
     List<Menu> getAllMenuItems();
     void createMenuItem(MenuDto menuDto);
 

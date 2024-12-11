@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
-import ru.isshepelev.auto.infrastructure.persistance.entity.enums.StatusRevision;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepositroty;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRevisionRepository;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
@@ -22,6 +21,26 @@ public class MenuServiceImpl implements MenuService {
 
     private final MenuRepositroty menuRepository;
     private final MenuRevisionRepository menuRevisionRepository;
+    private MenuRevision activeRevision;
+    @Override
+    public MenuRevision getActiveRevision() {
+        return activeRevision;
+    }
+    @Override
+    public void setActiveRevision(MenuRevision revision) {
+        this.activeRevision = revision;
+    }
+    @Override
+    public List<Menu> getItems(int page, int pageSize) {
+        if (activeRevision != null) {
+            List<Menu> revisionMenu = activeRevision.getRevision();
+            int start = page * pageSize;
+            int end = Math.min((start + pageSize), revisionMenu.size());
+            return revisionMenu.subList(start, end);
+        } else {
+            return Collections.emptyList();
+        }
+    }
 
 
     @Override
@@ -53,7 +72,6 @@ public class MenuServiceImpl implements MenuService {
         }
         MenuRevision revision = new MenuRevision();
         revision.setDateOfCreate(LocalDate.now());
-        revision.setStatus(StatusRevision.USED);
         revision.setRevision(menuList);
         menuRepository.saveAll(menuList);
         menuRevisionRepository.save(revision);
@@ -120,6 +138,7 @@ public class MenuServiceImpl implements MenuService {
     public List<Menu> getMenuFromRevision(Long revisionId) {
         Optional<MenuRevision> revisionOptional = menuRevisionRepository.findById(revisionId);
         if (revisionOptional.isPresent()) {
+            setActiveRevision(revisionOptional.get());
             return revisionOptional.get().getRevision();
         }
         return Collections.emptyList();

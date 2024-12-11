@@ -231,12 +231,14 @@
 
     <!-- Правая секция -->
     <div class="categories-section">
-        <h3>Ревизии меню</h3>
-        <select id="revisionSelect" onchange="loadItemsFromRevision()">
-            <option value="">Выберите ревизию</option>
-            <!-- Отображаем список доступных ревизий -->
-            <option th:each="revision : ${revisions}" th:value="${revision.id}" th:text="'Ревизия от ' + ${revision.dateOfCreate}"></option>
-        </select>
+        <form action="/select-revision" method="post">
+            <h3>Выберите ревизию</h3>
+            <select name="revisionId" id="revisionSelect">
+                <option value="">Выберите ревизию</option>
+                <option th:each="revision : ${revisions}" th:value="${revision.id}" th:text="'Ревизия от ' + ${revision.dateOfCreate}"></option>
+            </select>
+            <button type="submit">Выбрать</button>
+        </form>
         <h3>Категории</h3>
         <div id="items-list">
             <!-- Товары будут загружаться сюда как кнопки -->
