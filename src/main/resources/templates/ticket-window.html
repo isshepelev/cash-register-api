@@ -205,6 +205,11 @@
         .popup button:hover {
             background-color: #ff4d4d;
         }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -231,13 +236,14 @@
 
     <!-- Правая секция -->
     <div class="categories-section">
-        <form action="/select-revision" method="post">
+        <form action="/select-revision" method="post" onsubmit="return validateRevisionSelection()">
             <h3>Выберите ревизию</h3>
             <select name="revisionId" id="revisionSelect">
                 <option value="">Выберите ревизию</option>
                 <option th:each="revision : ${revisions}" th:value="${revision.id}" th:text="'Ревизия от ' + ${revision.dateOfCreate}"></option>
             </select>
             <button type="submit">Выбрать</button>
+            <p id="error-message" class="error-message" style="display: none;">Пожалуйста, выберите ревизию.</p>
         </form>
         <h3>Категории</h3>
         <div id="items-list">
@@ -266,6 +272,20 @@
     let currentPage = 0;
     let currentRevisionId = null;
 
+    // Функция для валидации выбора ревизии
+    function validateRevisionSelection() {
+        const revisionSelect = document.getElementById("revisionSelect");
+        const errorMessage = document.getElementById("error-message");
+
+        // Проверяем, выбрана ли ревизия
+        if (!revisionSelect.value) {
+            errorMessage.style.display = "block"; // Показываем сообщение об ошибке
+            return false; // Отменяем отправку формы
+        }
+
+        errorMessage.style.display = "none"; // Скрываем сообщение, если ревизия выбрана
+        return true; // Разрешаем отправку формы
+    }
     // Функция для загрузки товаров из выбранной ревизии
     function loadItemsFromRevision() {
         const revisionId = document.getElementById("revisionSelect").value;
@@ -315,7 +335,7 @@
             .then(response => response.text())
             .then(data => {
                 alert(data);
-                window.location.href = "/";
+                window.location.reload();
             })
             .catch(error => {
                 console.error("Ошибка:", error);
