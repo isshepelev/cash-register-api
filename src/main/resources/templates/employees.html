@@ -11,8 +11,8 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #2c2f33; /* Темный фон */
-            color: #ffffff; /* Белый текст */
+            background-color: #2c2f33;
+            color: #ffffff;
         }
 
         .container {
@@ -22,14 +22,14 @@
             justify-content: space-between;
             gap: 20px;
             padding: 20px;
-            background-color: #23272a; /* Темно-серый фон секций */
+            background-color: #23272a;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .menu-container td form {
-            display: inline-block; /* Размещаем формы (кнопки) в одну строку */
-            margin-right: 5px; /* Добавляем отступ между кнопками */
+            display: inline-block;
+            margin-right: 5px;
         }
 
         .form-container h3, .menu-container h3 {
@@ -51,7 +51,7 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #3a3f44; /* Темная подложка */
+            background-color: #3a3f44;
             color: #fff;
         }
 
@@ -62,7 +62,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
-            background-color: #ff6b6b; /* Красная кнопка */
+            background-color: #ff6b6b;
             color: #fff;
         }
 
@@ -113,9 +113,9 @@
             background-color: #ff0000;
         }
 
-        /* Стиль для вылазящего окна */
+
         .popup {
-            display: none; /* Скрыть по умолчанию */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -185,9 +185,7 @@
 <body>
 
 <div class="container">
-    <!-- Левая сторона: форма добавления сотрудника и добавления роли -->
     <div class="form-container">
-        <!-- Форма добавления сотрудника -->
         <h3>Добавить сотрудника</h3>
         <form th:action="@{/employees/create}" method="post">
             <div class="mb-3">
@@ -211,7 +209,6 @@
             <button type="submit" class="btn btn-primary w-100">Добавить</button>
         </form>
 
-        <!-- Форма добавления роли -->
         <h3>Добавить должности</h3>
         <form th:action="@{/employees/roles/create}" method="post">
             <div class="mb-3">
@@ -221,11 +218,9 @@
             <button type="submit" class="btn btn-primary w-100">Добавить должность</button>
         </form>
 
-        <!-- Кнопка для открытия списка ролей -->
         <button onclick="openPopup()" class="btn btn-secondary w-100" style="margin-top: 20px;">Показать должности</button>
     </div>
 
-    <!-- Правая сторона: список сотрудников -->
     <div class="menu-container">
         <h3>Список сотрудников</h3>
         <table class="table table-striped">
@@ -260,11 +255,6 @@
     </div>
 </div>
 
-<!--<div th:if="${error}" class="alert alert-danger" role="alert">-->
-<!--    <p th:text="${error}"></p>-->
-<!--</div>-->
-
-<!-- Вылазющее окно с ролями -->
 <div class="popup" id="rolesPopup">
     <div class="popup-content">
         <h3>Должности</h3>
@@ -294,12 +284,10 @@
 </div>
 
 <script>
-    // Открыть вылазящее окно
     function openPopup() {
         document.getElementById("rolesPopup").style.display = "flex";
     }
 
-    // Закрыть вылазящее окно
     function closePopup() {
         document.getElementById("rolesPopup").style.display = "none";
     }

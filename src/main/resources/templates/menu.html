@@ -13,8 +13,8 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #2c2f33; /* Темный фон */
-            color: #ffffff; /* Белый текст */
+            background-color: #2c2f33;
+            color: #ffffff;
         }
 
         .container {
@@ -24,7 +24,7 @@
             justify-content: space-between;
             gap: 20px;
             padding: 20px;
-            background-color: #23272a; /* Темно-серый фон секций */
+            background-color: #23272a;
             border-radius: 10px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
@@ -54,7 +54,7 @@
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            background-color: #3a3f44; /* Темная подложка */
+            background-color: #3a3f44;
             color: #fff;
         }
 
@@ -65,7 +65,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
-            background-color: #ff6b6b; /* Красная кнопка */
+            background-color: #ff6b6b;
             color: #fff;
         }
 
@@ -89,7 +89,7 @@
             padding: 10px;
             border-bottom: 1px solid #f0f0f0;
             font-size: 1.1em;
-            background-color: #3a3f44; /* Темная подложка */
+            background-color: #3a3f44;
             border-radius: 5px;
             margin-bottom: 10px;
         }
@@ -109,7 +109,7 @@
         }
 
         .menu-container .edit-button {
-            background-color: #d4af37; /* Темно-желтая кнопка */
+            background-color: #d4af37;
         }
 
         .menu-container .edit-button:hover {
@@ -121,7 +121,7 @@
         }
 
         .menu-container .delete-button {
-            background-color: #ff6b6b; /* Красная кнопка */
+            background-color: #ff6b6b;
         }
 
         .menu-container .delete-button:hover {
@@ -132,7 +132,6 @@
             background-color: #ea1f1f;
         }
 
-        /* Стили для выравнивания кнопок "Удалить" и "Редактировать" на одной линии */
         .menu-container .button-container {
             display: flex;
             gap: 10px;
@@ -210,10 +209,10 @@
         const selectedRevisionId = document.getElementById("revision").value;
         if (!selectedRevisionId) {
             document.getElementById("revisionError").style.display = 'block';
-            return false; // Не отправляем форму, если ревизия не выбрана
+            return false;
         }
         document.getElementById("revisionError").style.display = 'none';
-        return true; // Отправляем форму, если ревизия выбрана
+        return true;
     }
 </script>
 </body>
