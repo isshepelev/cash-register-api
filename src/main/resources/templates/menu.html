@@ -155,12 +155,14 @@
             <select id="revision" name="revision" onchange="submitRevisionForm()">
                 <option value="">--Выберите ревизию--</option>
                 <th:block th:each="revision : ${revisions}">
-                    <option th:value="${revision.id}" th:text="${revision.dateOfCreate}"></option>
+                    <option th:value="${revision.id}"
+                            th:text="${revision.dateOfCreate}"
+                            th:selected="${revision.id == selectedRevisionId}"></option>
                 </th:block>
             </select>
         </form>
         <h2>Добавить товар</h2>
-        <form th:action="@{/menu/add}" method="POST">
+        <form th:action="@{/menu/add}" method="POST" id="addItemForm" onsubmit="return validateRevisionSelection()">
             <input type="hidden" name="revisionId" th:value="${selectedRevisionId}">
             <label for="name">Название товара:</label>
             <input type="text" id="name" name="name" required>
@@ -173,6 +175,7 @@
             <br>
             <button type="submit">Добавить товар</button>
         </form>
+        <p id="revisionError" style="color: red; display: none;">Пожалуйста, выберите ревизию перед добавлением товара!</p>
     </div>
 
     <div class="menu-container">
@@ -202,6 +205,15 @@
         if (selectedRevisionId) {
             window.location.href = `/menu/revision/${selectedRevisionId}`;
         }
+    }
+    function validateRevisionSelection() {
+        const selectedRevisionId = document.getElementById("revision").value;
+        if (!selectedRevisionId) {
+            document.getElementById("revisionError").style.display = 'block';
+            return false; // Не отправляем форму, если ревизия не выбрана
+        }
+        document.getElementById("revisionError").style.display = 'none';
+        return true; // Отправляем форму, если ревизия выбрана
     }
 </script>
 </body>

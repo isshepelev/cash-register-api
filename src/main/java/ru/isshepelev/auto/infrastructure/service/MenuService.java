@@ -20,7 +20,7 @@ public interface MenuService {
     List<Menu> getItems(int page, int pageSize);
 
     List<Menu> getAllMenuItems();
-    void createMenuItem(MenuDto menuDto);
+    void createMenuItem(MenuDto menuDto, Long revisionId);
 
     void createNewMenu(List<MenuDto> menuDtoList);
 

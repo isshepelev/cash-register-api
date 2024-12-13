@@ -51,14 +51,18 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
-    public void createMenuItem(MenuDto menuDto) {
+    public void createMenuItem(MenuDto menuDto, Long revisionId) {
+        MenuRevision menuRevision = menuRevisionRepository.findById(revisionId).get();
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName(menuDto.getName());
         menu.setDescription(menuDto.getDescription());
         menu.setCount(menuDto.getCount());
+        menuRevision.getRevision().add(menu);
         log.info("добавление товара{} ", menu);
         menuRepository.save(menu);
+        menuRevisionRepository.save(menuRevision);
+
     }
     @Override
     public void createNewMenu(List<MenuDto> menuDtoList){

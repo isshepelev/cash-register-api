@@ -1,5 +1,6 @@
 package ru.isshepelev.auto.ui.controller;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +22,30 @@ import java.util.UUID;
 public class MenuController {
     private final MenuService menuService;
     @GetMapping()
-    public String showMenu(Model model) {
+    public String showMenu(Model model, HttpSession session) {
+        MenuRevision selectedRevision = (MenuRevision) session.getAttribute("selectedRevision");
         List<MenuRevision> revisions = menuService.getAllRevisions();
         model.addAttribute("revisions", revisions);
+
+        if (selectedRevision != null) {
+            List<Menu> menuItems = menuService.getMenuFromRevision(selectedRevision.getId());
+            model.addAttribute("menuItems", menuItems);
+            model.addAttribute("selectedRevisionId", selectedRevision.getId());
+        }
+
         return "menu";
     }
 
     @GetMapping("/revision/{id}")
-    public String showMenuItemsByRevision(@PathVariable Long id, Model model) {
+    public String showMenuItemsByRevision(@PathVariable Long id, Model model, HttpSession session) {
+        MenuRevision selectedRevision = menuService.getAllRevisions().stream()
+                .filter(revision -> revision.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+        if (selectedRevision != null) {
+            session.setAttribute("selectedRevision", selectedRevision);
+        }
+
         List<Menu> menuItems = menuService.getMenuFromRevision(id);
         List<MenuRevision> revisions = menuService.getAllRevisions();
         model.addAttribute("menuItems", menuItems);
@@ -50,9 +67,8 @@ public class MenuController {
     }
 
     @PostMapping("/add")
-    public String addMenuItem(@RequestParam String name, @RequestParam String description, @RequestParam int count, @RequestParam Long revisionId) { //TODO дто не судьба получать да ?
-        System.out.println(revisionId);
-//        menuService.createMenuItem(new MenuDto(name, description, count));
+    public String addMenuItem(@ModelAttribute MenuDto menuDto, @RequestParam Long revisionId) {
+        menuService.createMenuItem(menuDto, revisionId);
         return "redirect:/menu";
     }
 
