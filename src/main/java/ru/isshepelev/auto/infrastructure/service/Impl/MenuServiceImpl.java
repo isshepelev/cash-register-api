@@ -1,5 +1,6 @@
 package ru.isshepelev.auto.infrastructure.service.Impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,8 +101,17 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional
     public void deleteMenuItem(UUID id) {
-        log.info("удаление товара {} ", menuRepository.findById(id));
-        menuRepository.deleteById(id);
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Меню с id " + id + " не найдено"));
+        List<MenuRevision> menuRevisions = menuRevisionRepository.findAll();
+
+        for (MenuRevision menuRevision : menuRevisions) {
+            if (menuRevision.getRevision().removeIf(m -> m.getId().equals(id))) {
+                menuRevisionRepository.save(menuRevision);
+            }
+        }
+        log.info("Удаление меню: {}", menu);
+        menuRepository.delete(menu);
     }
     @Override
     public Optional<Menu> findMenuById(UUID id){

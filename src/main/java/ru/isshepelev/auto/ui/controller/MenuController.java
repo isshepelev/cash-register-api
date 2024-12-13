@@ -7,12 +7,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
+import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
 
-import java.awt.*;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,10 +20,20 @@ import java.util.UUID;
 @RequestMapping("/menu")
 public class MenuController {
     private final MenuService menuService;
-    @GetMapping
+    @GetMapping()
     public String showMenu(Model model) {
-        List<Menu> menuItems = menuService.getAllMenuItems();
+        List<MenuRevision> revisions = menuService.getAllRevisions();
+        model.addAttribute("revisions", revisions);
+        return "menu";
+    }
+
+    @GetMapping("/revision/{id}")
+    public String showMenuItemsByRevision(@PathVariable Long id, Model model) {
+        List<Menu> menuItems = menuService.getMenuFromRevision(id);
+        List<MenuRevision> revisions = menuService.getAllRevisions();
         model.addAttribute("menuItems", menuItems);
+        model.addAttribute("revisions", revisions);
+        model.addAttribute("selectedRevisionId", id);
         return "menu";
     }
 
@@ -41,8 +50,9 @@ public class MenuController {
     }
 
     @PostMapping("/add")
-    public String addMenuItem(@RequestParam String name, @RequestParam String description, @RequestParam int count) {
-        menuService.createMenuItem(new MenuDto(name, description, count));
+    public String addMenuItem(@RequestParam String name, @RequestParam String description, @RequestParam int count, @RequestParam Long revisionId) { //TODO дто не судьба получать да ?
+        System.out.println(revisionId);
+//        menuService.createMenuItem(new MenuDto(name, description, count));
         return "redirect:/menu";
     }
 

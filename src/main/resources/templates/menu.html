@@ -149,8 +149,19 @@
 
 <div class="container">
     <div class="form-container">
+        <h2>Выбрать ревизию</h2>
+        <form action="#" method="GET" id="revisionForm">
+            <label for="revision">Выберите ревизию:</label>
+            <select id="revision" name="revision" onchange="submitRevisionForm()">
+                <option value="">--Выберите ревизию--</option>
+                <th:block th:each="revision : ${revisions}">
+                    <option th:value="${revision.id}" th:text="${revision.dateOfCreate}"></option>
+                </th:block>
+            </select>
+        </form>
         <h2>Добавить товар</h2>
-        <form action="/menu/add" method="POST">
+        <form th:action="@{/menu/add}" method="POST">
+            <input type="hidden" name="revisionId" th:value="${selectedRevisionId}">
             <label for="name">Название товара:</label>
             <input type="text" id="name" name="name" required>
             <br>
@@ -167,12 +178,11 @@
     <div class="menu-container">
         <h2>Список товаров</h2>
         <ul>
-            <!-- Здесь будет список товаров -->
             <th:block th:each="item : ${menuItems}">
                 <li>
-                    <strong>Название:</strong> <span th:text="${item.name}">Название товара</span><br>
-                    <strong>Описание:</strong> <span th:text="${item.description}">Описание</span><br>
-                    <strong>Кол-во:</strong> <span th:text="${item.count}">Количество</span><br>
+                    <strong>Название:</strong> <span th:text="${item.name}"></span><br>
+                    <strong>Описание:</strong> <span th:text="${item.description}"></span><br>
+                    <strong>Кол-во:</strong> <span th:text="${item.count}"></span><br>
                     <div class="button-container">
                         <form th:action="@{/menu/delete/{id}(id=${item.id})}" method="POST">
                             <button type="submit" class="delete-button">Удалить</button>
@@ -186,6 +196,13 @@
         </ul>
     </div>
 </div>
-
+<script>
+    function submitRevisionForm() {
+        const selectedRevisionId = document.getElementById("revision").value;
+        if (selectedRevisionId) {
+            window.location.href = `/menu/revision/${selectedRevisionId}`;
+        }
+    }
+</script>
 </body>
 </html>
