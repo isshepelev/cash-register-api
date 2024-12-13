@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
 @Data
 @Table(name = "menu")
-public class Menu {
+public class Menu implements Serializable {
 
     @Id
     private UUID id;
