@@ -4,88 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Редактирование товара</title>
+    <link rel="stylesheet" href="/css/styles.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #2c2f33;
-            color: #ffffff;
-        }
-
         .container {
-            width: 90%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            display: contents;
+            justify-content: space-between;
+            gap: 20px;
             padding: 20px;
             background-color: #23272a;
             border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 10px 4px 10px rgba(0, 0, 0, 0.3);
         }
-
-        .form-container {
-            width: 100%;
-            background-color: #2c2f33;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-container h2 {
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-
-        .form-container label,
-        .form-container input {
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .form-container input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #3a3f44;
-            color: #fff;
-        }
-
-        .form-container button {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background-color: #ff6b6b;
-            color: #fff;
-        }
-
-        .form-container button:hover {
-            background-color: #ff4d4d;
-            transform: translateY(-2px);
-        }
-
-        .form-container button:active {
-            background-color: #e63939;
-            transform: translateY(1px);
-        }
-
         .button-container {
-            display: flex;
-            gap: 10px;
+            display: contents;
+            gap: 12px;
             margin-top: 20px;
         }
 
         .back-button {
-            padding: 12px 20px;
+            padding: 10px 20px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
@@ -102,6 +41,7 @@
         .back-button:active {
             background-color: #e63939;
         }
+
     </style>
 </head>
 <body>
