@@ -27,7 +27,7 @@ public interface MenuService {
     void updateMenuItem(UUID id, MenuDto menuDto);
     void deleteMenuItem(UUID id);
 
-    Optional<Menu> findMenuById(UUID id);
+    Menu getMenuById(UUID id);
 
     @Transactional
     List<Menu> getItems(int page, int pageSize, Long revisionId);
@@ -40,4 +40,6 @@ public interface MenuService {
 
     @Transactional
     void updateMenuItems(List<Menu> menuList);
+
+    MenuRevision getRevisionById(Long revisionId);
 }

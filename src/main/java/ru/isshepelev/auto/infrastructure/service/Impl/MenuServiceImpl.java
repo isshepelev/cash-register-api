@@ -4,7 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepositroty;
@@ -36,7 +38,7 @@ public class MenuServiceImpl implements MenuService {
         if (activeRevision != null) {
             List<Menu> revisionMenu = activeRevision.getRevision();
             int start = page * pageSize;
-            int end = Math.min((start + pageSize), revisionMenu.size());
+            int end = Math.min((start + pageSize), revisionMenu.size()); //TODO по моему я перестал использовать этот метод
             return revisionMenu.subList(start, end);
         } else {
             return Collections.emptyList();
@@ -118,8 +120,9 @@ public class MenuServiceImpl implements MenuService {
         menuRepository.delete(menu);
     }
     @Override
-    public Optional<Menu> findMenuById(UUID id){
-        return menuRepository.findById(id);
+    public Menu getMenuById(UUID id){
+        return menuRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid menu ID: " + id));
     }
     @Override
     @Transactional
@@ -180,5 +183,10 @@ public class MenuServiceImpl implements MenuService {
                 menuRepository.save(updatedMenu);
             }
         });
+    }
+    @Override
+    public MenuRevision getRevisionById(Long revisionId){
+        return menuRevisionRepository.findById(revisionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid revision ID: " + revisionId));
     }
 }

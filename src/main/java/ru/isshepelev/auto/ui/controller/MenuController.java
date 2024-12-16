@@ -80,7 +80,7 @@ public class MenuController {
     @GetMapping("/edit/{id}")
     public String editMenuItemForm(@PathVariable UUID id, Model model){
         model.addAttribute("menuItems", menuService.getAllMenuItems());
-        model.addAttribute("item" , menuService.findMenuById(id).get());
+        model.addAttribute("item" , menuService.getMenuById(id));
         return "edit-menu";
     }
 

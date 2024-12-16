@@ -30,8 +30,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<Order> getOrderById(UUID id) {
-        return orderRepository.findById(id);
+    public Order getOrderById(UUID id) {
+        Optional<Order> orderOptional = orderRepository.findById(id);
+        if (orderOptional.isEmpty()){
+            throw new NullPointerException();
+        }
+        return orderOptional.get();
     }
 
     @Override
@@ -48,6 +52,19 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         return order;
     }
+//    public Order createNewOrder(List<UUID> id){
+//        List<OrderMenuDto> menuList = new ArrayList<>();
+//        id.forEach(item -> {
+//            OrderMenuDto menu = new OrderMenuDto();
+//            menu.setId(item.getId());
+//            menu.setName(item.getName());
+//            menu.setDescription(item.getDescription());
+//            menuList.add(menu);
+//        });
+//        Order order = new Order(UUID.randomUUID(), LocalDate.now().atStartOfDay(), OrderStatus.CREATION, menuList);
+//        orderRepository.save(order);
+//        return order;
+//    }
 
     @Override
     public void processingOrder(Order orderCreate) {

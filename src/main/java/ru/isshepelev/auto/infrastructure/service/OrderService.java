@@ -13,7 +13,7 @@ public interface OrderService {
 
     List<Order> getAllOrders();
 
-    Optional<Order> getOrderById(UUID id);
+    Order getOrderById(UUID id);
 
     Order createNewOrder(List<Menu> itemsList);
 
