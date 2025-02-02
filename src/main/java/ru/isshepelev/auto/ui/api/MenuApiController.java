@@ -17,10 +17,10 @@ import java.util.UUID;
 @RequestMapping("/api/menu")
 public class MenuApiController {
     private final MenuService menuService;
-    @GetMapping("/{revisionId}/menu")
-    public ResponseEntity<List<Menu>> getMenuByRevisionId(@PathVariable Long revisionId){
-        return ResponseEntity.ok(menuService.getRevisionById(revisionId).getRevision());
-    }
+//    @GetMapping("/{revisionId}/menu")
+//    public ResponseEntity<List<Menu>> getMenuByRevisionId(@PathVariable Long revisionId){
+//        return ResponseEntity.ok(menuService.getRevisionById(revisionId).getRevision());
+//    }
     @GetMapping("/revisions")
     public ResponseEntity<List<MenuRevision>> getRevisions(){
         return ResponseEntity.ok(menuService.getAllRevisions());
@@ -50,4 +50,5 @@ public class MenuApiController {
         menuService.createNewMenu(menuDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    //TODO добавить контроллер по добавлению элемента в конкретную ревизию
 }

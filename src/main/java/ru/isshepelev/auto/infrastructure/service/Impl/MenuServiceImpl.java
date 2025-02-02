@@ -38,7 +38,7 @@ public class MenuServiceImpl implements MenuService {
         if (activeRevision != null) {
             List<Menu> revisionMenu = activeRevision.getRevision();
             int start = page * pageSize;
-            int end = Math.min((start + pageSize), revisionMenu.size()); //TODO по моему я перестал использовать этот метод
+            int end = Math.min((start + pageSize), revisionMenu.size());
             return revisionMenu.subList(start, end);
         } else {
             return Collections.emptyList();

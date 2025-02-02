@@ -5,7 +5,6 @@ import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Order;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -15,7 +14,8 @@ public interface OrderService {
 
     Order getOrderById(UUID id);
 
-    Order createNewOrder(List<Menu> itemsList);
+
+    Order createNewOrder(List<?> items);
 
     void processingOrder(Order orderCreate);
 }
