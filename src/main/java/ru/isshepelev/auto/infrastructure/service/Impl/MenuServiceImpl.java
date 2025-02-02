@@ -54,14 +54,19 @@ public class MenuServiceImpl implements MenuService {
     @Override
     @Transactional
     public void createMenuItem(MenuDto menuDto, Long revisionId) {
-        MenuRevision menuRevision = menuRevisionRepository.findById(revisionId).get();
+        Optional<MenuRevision> menuRevisionOptional = menuRevisionRepository.findById(revisionId);
+        if (menuRevisionOptional.isEmpty()){
+            log.error("отсутствует ревизия с id " + revisionId);
+            throw new IllegalArgumentException("Ревизия с id " + revisionId + " не найдена");
+        }
+        MenuRevision menuRevision = menuRevisionOptional.get();
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName(menuDto.getName());
         menu.setDescription(menuDto.getDescription());
         menu.setCount(menuDto.getCount());
         menuRevision.getRevision().add(menu);
-        log.info("добавление товара{} ", menu);
+        log.info("добавление товара " + menu + " в ревизию №" + revisionId);
         menuRepository.save(menu);
         menuRevisionRepository.save(menuRevision);
 

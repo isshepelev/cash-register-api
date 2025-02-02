@@ -50,5 +50,14 @@ public class MenuApiController {
         menuService.createNewMenu(menuDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-    //TODO добавить контроллер по добавлению элемента в конкретную ревизию
+
+    @PostMapping("/add-item/{revisionId}")
+    public ResponseEntity<String> addItemForRevision(@PathVariable Long revisionId, @RequestBody MenuDto menuDto){
+        try {
+            menuService.createMenuItem(menuDto,revisionId);
+            return ResponseEntity.ok().build();
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body("ревизия с id " + revisionId + " не найдена");
+        }
+    }
 }
