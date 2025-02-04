@@ -11,7 +11,11 @@ spring:
     timeout: 100m
     store-type: redis
   kafka:
-    bootstrap-servers: kafka:9092 #localhost:9092 kafka:9092
+    bootstrap-servers: localhost:9092 #localhost:9092 kafka:9092
   redis:
-    host: redis #redis localhost
+    host: localhost #redis localhost
     port: 6379
+
+jwt:
+  secret: noifeojigedsikn
+  expirationMS: 2
