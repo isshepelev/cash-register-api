@@ -1,44 +1,41 @@
-package ru.isshepelev.auto.security;
+package ru.isshepelev.auto.security.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import java.util.Collection;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-public class UserDetailsImpl implements UserDetails {
+@Entity
+@Table(name = "users")
+public class User implements UserDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+
     private String username;
     private String password;
-    private String mail;
+    private String email;
     private Role role;
 
-    public static UserDetailsImpl build(User user) {
-        return new UserDetailsImpl(
-                user.getId(),
-                user.getUsername(),
-                user.getPassword(),
-                user.getEmail(),
-                user.getRole()
-        );
-    }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "license_id", referencedColumnName = "id", unique = true)
+    @JsonManagedReference
+    private License license;
+
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
     }
 
     @Override

@@ -1,9 +1,9 @@
-package ru.isshepelev.auto.security;
+package ru.isshepelev.auto.security.dto;
 
 import lombok.Data;
 
 @Data
-public class SingInRequestDto {
+public class SignInRequestDto {
     private String username;
     private String password;
 }
