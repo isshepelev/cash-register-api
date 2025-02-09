@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class TestController {
 
     @GetMapping("")
-    public String userAccess(Principal principal, Model model){
-        model.addAttribute("name", principal.getName());
-        return "admin";
+    public String userAccess(Principal principal){
+        return principal.getName();
     }
 
 }

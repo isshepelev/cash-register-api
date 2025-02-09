@@ -6,10 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.isshepelev.auto.security.dto.RefreshTokenRequestDto;
-import ru.isshepelev.auto.security.dto.SignInRequestDto;
-import ru.isshepelev.auto.security.dto.SignUpRequestDto;
-import ru.isshepelev.auto.security.service.impl.AuthenticationService;
+import ru.isshepelev.auto.security.dto.*;
+import ru.isshepelev.auto.security.service.AuthenticationService;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,12 +18,12 @@ public class SecurityController {
 
     @PostMapping("/sign-up")
     ResponseEntity<?> singUp(@RequestBody SignUpRequestDto singUpRequest){
-        return ResponseEntity.ok(authenticationService.singUp(singUpRequest));
+        return authenticationService.singUp(singUpRequest);
     }
 
     @PostMapping("/sign-in")
     ResponseEntity<?> signIn(@RequestBody SignInRequestDto signInRequestDto){
-        return ResponseEntity.ok(authenticationService.signIn(signInRequestDto));
+        return authenticationService.signIn(signInRequestDto);
     }
 
     @PostMapping("/refresh")
@@ -34,3 +32,4 @@ public class SecurityController {
     }
 
 }
+//TODO сделать чтобы при переходе на любой url перебрасывало на страницу с регистрацией или входом так же сделать обновление jwt токена переделать html страничку под единый стиль

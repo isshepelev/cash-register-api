@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.isshepelev.auto.security.service.impl.JwtCore;
+import ru.isshepelev.auto.security.service.JwtCore;
 import ru.isshepelev.auto.security.service.impl.UserServiceImpl;
 
 import java.io.IOException;

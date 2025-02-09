@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
@@ -31,7 +32,7 @@ public class MenuServiceImpl implements MenuService {
     }
     @Override
     public void setActiveRevision(MenuRevision revision) {
-        this.activeRevision = revision;
+        this.activeRevision = revision; // TODO нахуя я сюда это записал
     }
     @Override
     public List<Menu> getItems(int page, int pageSize) {

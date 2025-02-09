@@ -2,6 +2,8 @@ package ru.isshepelev.auto.security.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,20 +19,30 @@ import ru.isshepelev.auto.security.entity.Role;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.LicenseRepository;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.AuthenticationService;
+import ru.isshepelev.auto.security.service.UserService;
 
 import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationService {
-    private final UserRepository userRepository; //TODO переделать чтобы тут был сервис
+public class AuthenticationServiceImpl implements AuthenticationService {
     private final LicenseRepository licenseRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final JwtCore jwtCore;
+    private final JwtCoreImpl jwtCoreImpl;
+    private final UserRepository userRepository;
 
-    public User singUp(SignUpRequestDto singUpRequest){ //TODO добавить проверки
+    @Override
+    public ResponseEntity<?> singUp(SignUpRequestDto singUpRequest){
+        if (userRepository.existsByUsername((singUpRequest.getUsername()))) {
+            return ResponseEntity.badRequest().body("Имя пользователя уже существует.");
+        }
+        if (userRepository.existsByEmail((singUpRequest.getEmail()))) {
+            return ResponseEntity.badRequest().body("Email уже используется.");
+        }
+
         License license = new License();
         license.setActive(false);
         license.setDateOfCreation(null);
@@ -38,7 +50,7 @@ public class AuthenticationService {
 
         User user = new User();
         license.setUser(user);
-        user.setUsername(singUpRequest.getUsername()); // TODO проверка на та что пользователь с таким уже существует добавить надо
+        user.setUsername(singUpRequest.getUsername());
         user.setPassword(passwordEncoder.encode(singUpRequest.getPassword()));
         user.setEmail(singUpRequest.getEmail());
         user.setRole(Role.OWNER);
@@ -47,30 +59,36 @@ public class AuthenticationService {
         log.info("создание новой лицензии "+ license +" для пользователя " + user);
         userRepository.save(user);
         log.info("создание нового пользователя " + user);
-        return user;
+        return ResponseEntity.ok("success");
     }
 
-    public JwtAuthenticationResponseDto signIn(SignInRequestDto signInRequestDto){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequestDto.getUsername(), signInRequestDto.getPassword()));
-        var user = userRepository.findUserByUsername(signInRequestDto.getUsername()).orElseThrow(() -> new UsernameNotFoundException("не верный логин или пароль"));
+    @Override
+    public ResponseEntity<?> signIn(SignInRequestDto signInRequestDto){
+        try {
 
-        var jwt = jwtCore.generateToken(user);
-        var refreshToken = jwtCore.generateRefreshToken(new HashMap<>(), user);
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequestDto.getUsername(), signInRequestDto.getPassword()));
+            var user = userRepository.findUserByUsername(signInRequestDto.getUsername()).orElseThrow(() -> new UsernameNotFoundException("user not found"));
 
-        JwtAuthenticationResponseDto jwtAuthenticationResponseDto = new JwtAuthenticationResponseDto();
-        jwtAuthenticationResponseDto.setToken(jwt);
-        jwtAuthenticationResponseDto.setRefreshToken(refreshToken);
-        return jwtAuthenticationResponseDto;
+            var jwt = jwtCoreImpl.generateToken(user);
+            var refreshToken = jwtCoreImpl.generateRefreshToken(new HashMap<>(), user);
 
+            JwtAuthenticationResponseDto jwtAuthenticationResponseDto = new JwtAuthenticationResponseDto();
+            jwtAuthenticationResponseDto.setToken(jwt);
+            jwtAuthenticationResponseDto.setRefreshToken(refreshToken);
+            return ResponseEntity.ok(jwtAuthenticationResponseDto);
+        }catch (BadCredentialsException e){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Неверный логин или пароль");
+        }
     }
 
+    @Override
     public JwtAuthenticationResponseDto refreshToken(RefreshTokenRequestDto request){
-        String username = jwtCore.extractUsername(request.getToken());
-        User user = userRepository.findUserByUsername(username).orElseThrow(() -> new UsernameNotFoundException("пользователь не найден"));
-        if (!jwtCore.isTokenValid(request.getToken(), user)){
+        String username = jwtCoreImpl.extractUsername(request.getToken());
+        User user = userRepository.findUserByUsername(username).orElseThrow(() -> new UsernameNotFoundException("user not found"));
+        if (!jwtCoreImpl.isTokenValid(request.getToken(), user)){
             throw new BadCredentialsException("токен не валидный");
         }
-        var jwt = jwtCore.generateToken(user);
+        var jwt = jwtCoreImpl.generateToken(user);
 
         JwtAuthenticationResponseDto jwtAuthenticationResponseDto = new JwtAuthenticationResponseDto();
         jwtAuthenticationResponseDto.setToken(jwt);
