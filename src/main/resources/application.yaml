@@ -15,7 +15,3 @@ spring:
   redis:
     host: localhost #redis localhost
     port: 6379
-
-jwt:
-  secret: noifeojigedsikn
-  expirationMS: 2
