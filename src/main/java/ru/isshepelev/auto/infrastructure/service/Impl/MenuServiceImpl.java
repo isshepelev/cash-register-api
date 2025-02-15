@@ -32,7 +32,7 @@ public class MenuServiceImpl implements MenuService {
     }
     @Override
     public void setActiveRevision(MenuRevision revision) {
-        this.activeRevision = revision; // TODO нахуя я сюда это записал
+        this.activeRevision = revision;
     }
     @Override
     public List<Menu> getItems(int page, int pageSize) {
