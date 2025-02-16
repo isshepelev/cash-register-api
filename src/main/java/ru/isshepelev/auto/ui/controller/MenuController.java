@@ -20,12 +20,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/menu")
 public class MenuController {
+
     private final MenuService menuService;
+
+
     @GetMapping()
     public String showMenu(Model model, HttpSession session) {
         MenuRevision selectedRevision = (MenuRevision) session.getAttribute("selectedRevision");
-        List<MenuRevision> revisions = menuService.getAllRevisions();
-        model.addAttribute("revisions", revisions);
+        model.addAttribute("revisions", menuService.getAllRevisions());
 
         if (selectedRevision != null) {
             List<Menu> menuItems = menuService.getMenuFromRevision(selectedRevision.getId());
@@ -36,28 +38,25 @@ public class MenuController {
         return "menu";
     }
 
+
     @GetMapping("/revision/{id}")
     public String showMenuItemsByRevision(@PathVariable Long id, Model model, HttpSession session) {
-        MenuRevision selectedRevision = menuService.getAllRevisions().stream()
-                .filter(revision -> revision.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-        if (selectedRevision != null) {
-            session.setAttribute("selectedRevision", selectedRevision);
-        }
+        MenuRevision selectedRevision = menuService.getRevisionById(id);
+        session.setAttribute("selectedRevision", selectedRevision);
 
-        List<Menu> menuItems = menuService.getMenuFromRevision(id);
-        List<MenuRevision> revisions = menuService.getAllRevisions();
-        model.addAttribute("menuItems", menuItems);
-        model.addAttribute("revisions", revisions);
+        model.addAttribute("menuItems", menuService.getMenuFromRevision(id));
+        model.addAttribute("revisions", menuService.getAllRevisions());
         model.addAttribute("selectedRevisionId", id);
         return "menu";
     }
 
+
     @GetMapping("/create")
-    public String viewCreateMenu(){
+    public String viewCreateMenu() {
         return "create-menu";
     }
+
+
     @PostMapping("/create")
     public ResponseEntity<Void> createNewMenu(@RequestBody List<MenuDto> menuDto) {
         menuService.createNewMenu(menuDto);
@@ -66,39 +65,47 @@ public class MenuController {
                 .build();
     }
 
+
     @PostMapping("/add")
     public String addMenuItem(@ModelAttribute MenuDto menuDto, @RequestParam Long revisionId) {
         menuService.createMenuItem(menuDto, revisionId);
         return "redirect:/menu";
     }
 
+
     @PostMapping("/delete/{id}")
     public String deleteMenuItem(@PathVariable UUID id) {
         menuService.deleteMenuItem(id);
         return "redirect:/menu";
     }
+
+
     @GetMapping("/edit/{id}")
-    public String editMenuItemForm(@PathVariable UUID id, Model model){
+    public String editMenuItemForm(@PathVariable UUID id, Model model) {
         model.addAttribute("menuItems", menuService.getAllMenuItems());
-        model.addAttribute("item" , menuService.getMenuById(id));
+        model.addAttribute("item", menuService.getMenuById(id));
         return "edit-menu";
     }
 
+
     @PostMapping("/edit/{id}")
-    public String editMenuItem(@PathVariable UUID id, @ModelAttribute MenuDto menuDto){
+    public String editMenuItem(@PathVariable UUID id, @ModelAttribute MenuDto menuDto) {
         menuService.updateMenuItem(id, menuDto);
         return "redirect:/menu";
     }
+
+
     @GetMapping("/stop-list")
-    public String stopList(Model model){
+    public String stopList(Model model) {
         List<Menu> stopList = menuService.getStopList();
         model.addAttribute("stopList", stopList);
         return "stop-list";
     }
 
+
     @PostMapping("/stop-list")
     @ResponseBody
-    public ResponseEntity<List<Menu>> stopList(){
+    public ResponseEntity<List<Menu>> stopList() {
         List<Menu> stopList = menuService.getAllMenuItems()
                 .stream()
                 .filter(e -> e.getCount() == 0)

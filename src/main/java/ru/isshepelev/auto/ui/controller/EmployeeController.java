@@ -22,8 +22,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/employees")
 public class EmployeeController {
+
     private final EmployeeService employeeService;
     private final RoleService roleService;
+
 
     @GetMapping
     public String listEmployees(Model model) {
@@ -32,16 +34,20 @@ public class EmployeeController {
         return "employees";
     }
 
+
     @PostMapping("/{id}")
     public String deleteEmployee(@PathVariable UUID id) {
         employeeService.deleteEmployeeById(id);
         return "redirect:/employees";
     }
+
+
     @PostMapping("/create")
     public String createEmployee(@ModelAttribute EmployeeCreateDto employeeDto) {
         employeeService.createEmployee(employeeDto);
         return "redirect:/employees";
     }
+
 
     @PostMapping("/roles/create")
     public String createRole(@RequestParam String role, RedirectAttributes redirectAttributes) {
@@ -50,8 +56,9 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+
     @PostMapping("/roles/delete/{id}")
-    public String deleteRole(@PathVariable UUID id, RedirectAttributes redirectAttributes){
+    public String deleteRole(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
         try {
             roleService.deletRoleById(id);
         } catch (RuntimeException e) {
@@ -60,33 +67,26 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
+
     @GetMapping("/edit/{id}")
-    public String editEmployeeForm(@PathVariable UUID id, Model model){
+    public String editEmployeeForm(@PathVariable UUID id, Model model) {
         model.addAttribute("employees", employeeService.getAllEmployee());
         model.addAttribute("employee", employeeService.getEmployeeById(id).get());
         model.addAttribute("roles", roleService.getRoles());
         return "edit-employee";
     }
 
+
     @PostMapping("/edit/{id}")
-    public String editEmployee(@PathVariable UUID id, @ModelAttribute EmployeeEditDto employeeEditDto){
+    public String editEmployee(@PathVariable UUID id, @ModelAttribute EmployeeEditDto employeeEditDto) {
         employeeService.update(id, employeeEditDto);
         return "redirect:/employees";
     }
+
+
     @PostMapping("/check-access/{employeeCode}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> checkAccess(@PathVariable int employeeCode, HttpSession session) {
-        Optional<Employee> employeeOpt = employeeService.findEmployeeByPersonalCode(employeeCode);
-
-        Map<String, Object> response = new HashMap<>();
-        if (employeeOpt.isPresent() && employeeOpt.get().isCashRegisterAccessible()) {
-            session.setAttribute("employeeName", employeeOpt.get().getName() + " " + employeeOpt.get().getSurname());
-            response.put("accessGranted", true);
-        } else {
-            response.put("accessGranted", false);
-        }
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(employeeService.checkAccess(employeeCode, session));
     }
-
 }

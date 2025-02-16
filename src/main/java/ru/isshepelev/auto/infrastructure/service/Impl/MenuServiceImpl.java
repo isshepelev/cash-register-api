@@ -2,15 +2,15 @@ package ru.isshepelev.auto.infrastructure.service.Impl;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import ru.isshepelev.auto.infrastructure.persistance.entity.MenuRevision;
-import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepositroty;
+import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepository;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRevisionRepository;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
@@ -21,29 +21,22 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Data
 public class MenuServiceImpl implements MenuService {
 
-    private final MenuRepositroty menuRepository;
+    private final MenuRepository menuRepository;
     private final MenuRevisionRepository menuRevisionRepository;
     private MenuRevision activeRevision;
-    @Override
-    public MenuRevision getActiveRevision() {
-        return activeRevision;
-    }
-    @Override
-    public void setActiveRevision(MenuRevision revision) {
-        this.activeRevision = revision;
-    }
+
     @Override
     public List<Menu> getItems(int page, int pageSize) {
-        if (activeRevision != null) {
-            List<Menu> revisionMenu = activeRevision.getRevision();
-            int start = page * pageSize;
-            int end = Math.min((start + pageSize), revisionMenu.size());
-            return revisionMenu.subList(start, end);
-        } else {
+        if (activeRevision == null) {
             return Collections.emptyList();
         }
+        List<Menu> revisionMenu = activeRevision.getRevision();
+        int start = page * pageSize;
+        int end = Math.min((start + pageSize), revisionMenu.size());
+        return revisionMenu.subList(start, end);
     }
 
 
@@ -52,30 +45,33 @@ public class MenuServiceImpl implements MenuService {
         return menuRepository.findAll();
     }
 
+
     @Override
     @Transactional
     public void createMenuItem(MenuDto menuDto, Long revisionId) {
-        Optional<MenuRevision> menuRevisionOptional = menuRevisionRepository.findById(revisionId);
-        if (menuRevisionOptional.isEmpty()){
-            log.error("отсутствует ревизия с id " + revisionId);
-            throw new IllegalArgumentException("Ревизия с id " + revisionId + " не найдена");
-        }
-        MenuRevision menuRevision = menuRevisionOptional.get();
+        MenuRevision menuRevision = menuRevisionRepository.findById(revisionId)
+                .orElseThrow(() -> {
+                    log.error("Отсутствует ревизия с id {}", revisionId);
+                    return new IllegalArgumentException("Ревизия с id " + revisionId + " не найдена");
+                });
+
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName(menuDto.getName());
         menu.setDescription(menuDto.getDescription());
         menu.setCount(menuDto.getCount());
         menuRevision.getRevision().add(menu);
-        log.info("добавление товара " + menu + " в ревизию №" + revisionId);
+
+        log.info("Добавление товара {} в ревизию №{}", menu, revisionId);
         menuRepository.save(menu);
         menuRevisionRepository.save(menuRevision);
-
     }
+
+
     @Override
-    public void createNewMenu(List<MenuDto> menuDtoList){
+    public void createNewMenu(List<MenuDto> menuDtoList) {
         List<Menu> menuList = new ArrayList<>();
-        for (MenuDto dto : menuDtoList){
+        for (MenuDto dto : menuDtoList) {
             Menu menu = new Menu();
             menu.setId(UUID.randomUUID());
             menu.setName(dto.getName());
@@ -88,26 +84,21 @@ public class MenuServiceImpl implements MenuService {
         revision.setRevision(menuList);
         menuRepository.saveAll(menuList);
         menuRevisionRepository.save(revision);
-
     }
+
 
     @Override
     @Transactional
     public void updateMenuItem(UUID id, MenuDto menuDto) {
-        Optional<Menu> menuOptional = menuRepository.findById(id);
-        if (menuOptional.isPresent()) {
-            Menu menu = menuOptional.get();
-            menu.setName(menuDto.getName());
-            menu.setDescription(menuDto.getDescription());
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Меню с id " + id + " не найдено"));
 
-            if (menuDto.getCount() < 0){
-                menu.setCount(0);
-            }
+        menu.setName(menuDto.getName());
+        menu.setDescription(menuDto.getDescription());
+        menu.setCount(Math.max(menuDto.getCount(), 0));
 
-            menu.setCount(menuDto.getCount());
-            log.info("изменение товара {} ", menu);
-            menuRepository.save(menu);
-        }
+        log.info("Изменение товара {}", menu);
+        menuRepository.save(menu);
     }
 
     @Override
@@ -115,67 +106,70 @@ public class MenuServiceImpl implements MenuService {
     public void deleteMenuItem(UUID id) {
         Menu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Меню с id " + id + " не найдено"));
-        List<MenuRevision> menuRevisions = menuRevisionRepository.findAll();
 
-        for (MenuRevision menuRevision : menuRevisions) {
-            if (menuRevision.getRevision().removeIf(m -> m.getId().equals(id))) {
-                menuRevisionRepository.save(menuRevision);
+        menuRevisionRepository.findAll().forEach(revision -> {
+            if (revision.getRevision().removeIf(m -> m.getId().equals(id))) {
+                menuRevisionRepository.save(revision);
             }
-        }
+        });
+
         log.info("Удаление меню: {}", menu);
         menuRepository.delete(menu);
     }
+
+
     @Override
-    public Menu getMenuById(UUID id){
+    public Menu getMenuById(UUID id) {
         return menuRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid menu ID: " + id));
     }
+
+
     @Override
     @Transactional
     public List<Menu> getItems(int page, int pageSize, Long revisionId) {
-        MenuRevision currentRevision = null;
+        MenuRevision currentRevision = Optional.ofNullable(revisionId)
+                .flatMap(menuRevisionRepository::findById)
+                .orElseGet(menuRevisionRepository::findTopByOrderByDateOfCreateDesc);
 
-        if (revisionId != null) {
-            Optional<MenuRevision> revisionOptional = menuRevisionRepository.findById(revisionId);
-            if (revisionOptional.isPresent()) {
-                currentRevision = revisionOptional.get();
-            }
-        } else {
-            currentRevision = menuRevisionRepository.findTopByOrderByDateOfCreateDesc();
-        }
-
-        if (currentRevision != null) {
-            List<Menu> revisionMenu = currentRevision.getRevision();
-            int start = page * pageSize;
-            int end = Math.min(start + pageSize, revisionMenu.size());
-            return revisionMenu.subList(start, end);
-        } else {
+        if (currentRevision == null) {
             return Collections.emptyList();
         }
+
+        List<Menu> revisionMenu = currentRevision.getRevision();
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, revisionMenu.size());
+        return revisionMenu.subList(start, end);
     }
+
+
     @Override
     public List<MenuRevision> getAllRevisions() {
         return menuRevisionRepository.findAll();
     }
+
+
     @Override
     public List<Menu> getMenuFromRevision(Long revisionId) {
-        Optional<MenuRevision> revisionOptional = menuRevisionRepository.findById(revisionId);
-        if (revisionOptional.isPresent()) {
-            setActiveRevision(revisionOptional.get());
-            return revisionOptional.get().getRevision();
-        }
-        return Collections.emptyList();
+        return menuRevisionRepository.findById(revisionId)
+                .map(revision -> {
+                    setActiveRevision(revision);
+                    return revision.getRevision();
+                })
+                .orElse(Collections.emptyList());
     }
 
     @Override
-    public List<Menu> getStopList(){
+    public List<Menu> getStopList() {
         return getAllMenuItems().stream()
                 .filter(e -> e.getCount() == 0)
                 .toList();
     }
+
+
     @Override
     @Transactional
-    public void updateMenuItems(List<Menu> menuList){
+    public void updateMenuItems(List<Menu> menuList) {
         if (menuList == null || menuList.isEmpty()) {
             return;
         }
@@ -190,8 +184,10 @@ public class MenuServiceImpl implements MenuService {
             }
         });
     }
+
+
     @Override
-    public MenuRevision getRevisionById(Long revisionId){
+    public MenuRevision getRevisionById(Long revisionId) {
         return menuRevisionRepository.findById(revisionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid revision ID: " + revisionId));
     }

@@ -1,5 +1,6 @@
 package ru.isshepelev.auto.infrastructure.service;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Employee;
@@ -7,6 +8,7 @@ import ru.isshepelev.auto.infrastructure.service.dto.EmployeeCreateDto;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeEditDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,4 +27,6 @@ public interface EmployeeService {
 
     @Transactional
     void update(UUID id, EmployeeEditDto dto);
+
+    Map<String, Object> checkAccess(int employeeCode, HttpSession session);
 }

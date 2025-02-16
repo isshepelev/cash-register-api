@@ -7,6 +7,6 @@ import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
 import java.util.UUID;
 
 @Repository
-public interface MenuRepositroty extends JpaRepository<Menu, UUID> {
+public interface MenuRepository extends JpaRepository<Menu, UUID> {
 
 }
