@@ -168,7 +168,6 @@
 </head>
 <body>
 <div class="container">
-
     <div class="orders-section">
         <div class="header">
             <span th:text="${session.employeeName}"></span>
@@ -323,7 +322,6 @@
 
     loadItems(currentPage);
 
-    loadItems(currentPage);
     function openLoginPopup() {
         document.getElementById("loginPopup").style.display = "flex";
     }
@@ -351,24 +349,6 @@
                 document.getElementById("loginError").style.display = "block";
             });
     }
-    fetch('/orders/create', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderItems)
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                window.location.href = "/";
-            }
-        })
-        .catch(error => {
-            console.error("Ошибка при отправке данных:", error);
-        });
 </script>
 </body>
 </html>

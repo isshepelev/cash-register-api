@@ -4,12 +4,17 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Employee;
 import ru.isshepelev.auto.infrastructure.persistance.repository.EmployeeRepository;
 import ru.isshepelev.auto.infrastructure.service.EmployeeService;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeCreateDto;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeEditDto;
+import ru.isshepelev.auto.security.entity.User;
+import ru.isshepelev.auto.security.repository.UserRepository;
 
 import java.util.*;
 
@@ -19,15 +24,18 @@ import java.util.*;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<Employee> getAllEmployee() {
-        return employeeRepository.findAll();
+        return employeeRepository.findAll().stream()
+                .filter(employee -> employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())).toList();
     }
 
     @Override
     public Optional<Employee> getEmployeeById(UUID id) {
-        return Optional.of(employeeRepository.findById(id).get());
+        return employeeRepository.findById(id)
+                .filter(employee -> employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
 
     @Override
@@ -39,6 +47,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPersonalCode(generateUniquePersonalCode());
         employee.setRole(employeeDto.getRole());
         employee.setCashRegisterAccessible(employeeDto.isCashRegisterAccessible());
+
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        employee.setOwner(user);
         employeeRepository.save(employee);
     }
 
@@ -52,34 +67,62 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployeeById(UUID id) {
+        Optional<Employee> employeeOptional = employeeRepository.findById(id);
+
+        if (employeeOptional.isEmpty()) {
+            throw new RuntimeException("Сотрудник не найден");
+        }
+
+        Employee employee = employeeOptional.get();
+        if (!employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+            throw new AccessDeniedException("Нет прав на удаление данного сотрудника");
+        }
+
+        log.info("Удаление сотрудника с id {}", id);
         employeeRepository.deleteById(id);
     }
 
     @Override
     public Optional<Employee> findEmployeeByPersonalCode(int personalCode) {
-        return employeeRepository.findByPersonalCode(personalCode);
+        return employeeRepository.findByPersonalCode(personalCode)
+                .filter(employee -> employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
+
 
     @Override
     @Transactional
     public void update(UUID id, EmployeeEditDto dto) {
         Optional<Employee> employeeOptional = employeeRepository.findById(id);
-        if (employeeOptional.isPresent()) {
-            Employee employee = employeeOptional.get();
-            employee.setRole(dto.getRole());
-            employee.setName(dto.getName());
-            employee.setSurname(dto.getSurname());
-            employee.setCashRegisterAccessible(dto.isCashRegisterAccessible());
-            log.info("изменение сотрудника на {}", dto);
-            employeeRepository.save(employee);
+
+        if (employeeOptional.isEmpty()) {
+            throw new RuntimeException("Сотрудник не найден");
         }
+
+        Employee employee = employeeOptional.get();
+
+        if (!employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+            throw new AccessDeniedException("Нет прав на изменение данного сотрудника");
+        }
+
+        employee.setRole(dto.getRole());
+        employee.setName(dto.getName());
+        employee.setSurname(dto.getSurname());
+        employee.setCashRegisterAccessible(dto.isCashRegisterAccessible());
+
+        log.info("Изменение сотрудника с id {} на {}", id, dto);
+        employeeRepository.save(employee);
     }
 
     @Override
     public Map<String, Object> checkAccess(int employeeCode, HttpSession session) {
-        Employee employee = findEmployeeByPersonalCode(employeeCode)
-                .orElseThrow(() -> new RuntimeException("нет доступа к кассе: " + employeeCode)); //TODO испрпавить или как-то ловить исключение
+        Optional<Employee> employeeOpt = findEmployeeByPersonalCode(employeeCode);
 
+        if (employeeOpt.isEmpty()) {
+            log.error("Работник с code: " + employeeCode + " не найден или нет доступа");
+            throw new RuntimeException("Работник не найден или доступ запрещен");
+        }
+
+        Employee employee = employeeOpt.get();
         Map<String, Object> response = new HashMap<>();
         response.put("accessGranted", employee.isCashRegisterAccessible());
 

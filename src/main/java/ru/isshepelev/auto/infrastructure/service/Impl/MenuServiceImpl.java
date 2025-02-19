@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Menu;
@@ -14,6 +16,8 @@ import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRepository;
 import ru.isshepelev.auto.infrastructure.persistance.repository.MenuRevisionRepository;
 import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
+import ru.isshepelev.auto.security.entity.User;
+import ru.isshepelev.auto.security.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -27,6 +31,7 @@ public class MenuServiceImpl implements MenuService {
     private final MenuRepository menuRepository;
     private final MenuRevisionRepository menuRevisionRepository;
     private MenuRevision activeRevision;
+    private final UserRepository userRepository;
 
     @Override
     public List<Menu> getItems(int page, int pageSize) {
@@ -82,6 +87,13 @@ public class MenuServiceImpl implements MenuService {
         MenuRevision revision = new MenuRevision();
         revision.setDateOfCreate(LocalDate.now());
         revision.setRevision(menuList);
+
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (user == null){
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        revision.setOwner(user);
         menuRepository.saveAll(menuList);
         menuRevisionRepository.save(revision);
     }
@@ -145,13 +157,13 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuRevision> getAllRevisions() {
-        return menuRevisionRepository.findAll();
+        return menuRevisionRepository.findByOwnerUsername(SecurityContextHolder.getContext().getAuthentication().getName());
     }
 
 
     @Override
     public List<Menu> getMenuFromRevision(Long revisionId) {
-        return menuRevisionRepository.findById(revisionId)
+        return menuRevisionRepository.findByIdAndOwnerUsername(revisionId, SecurityContextHolder.getContext().getAuthentication().getName())
                 .map(revision -> {
                     setActiveRevision(revision);
                     return revision.getRevision();
@@ -161,8 +173,9 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> getStopList() {
-        return getAllMenuItems().stream()
-                .filter(e -> e.getCount() == 0)
+        return getAllRevisions().stream()
+                .flatMap(revision -> revision.getRevision().stream())
+                .filter(menu -> menu.getCount() == 0)
                 .toList();
     }
 
@@ -188,7 +201,8 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuRevision getRevisionById(Long revisionId) {
-        return menuRevisionRepository.findById(revisionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid revision ID: " + revisionId));
+        return menuRevisionRepository.findByIdAndOwnerUsername(revisionId, SecurityContextHolder.getContext().getAuthentication().getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid revision ID or unauthorized: " + revisionId));
     }
 }
+//TODO сделать отдельный метод для получения username SecurityContextHolder.getContext().getAuthentication().getName()

@@ -3,6 +3,7 @@ package ru.isshepelev.auto.infrastructure.persistance.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import ru.isshepelev.auto.security.entity.User;
 
 import java.io.Serializable;
 import java.util.UUID;

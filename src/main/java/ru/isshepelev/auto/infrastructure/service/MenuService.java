@@ -13,7 +13,6 @@ import java.util.UUID;
 @Service
 public interface MenuService {
 
-    MenuRevision getActiveRevision();
 
     void setActiveRevision(MenuRevision revision);
 

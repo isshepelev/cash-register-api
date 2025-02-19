@@ -2,6 +2,8 @@ package ru.isshepelev.auto.infrastructure.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Employee;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Role;
@@ -9,6 +11,8 @@ import ru.isshepelev.auto.infrastructure.persistance.repository.EmployeeReposito
 import ru.isshepelev.auto.infrastructure.persistance.repository.RoleRepository;
 import ru.isshepelev.auto.infrastructure.service.EmployeeService;
 import ru.isshepelev.auto.infrastructure.service.RoleService;
+import ru.isshepelev.auto.security.entity.User;
+import ru.isshepelev.auto.security.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +25,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void addRole(String newRole) {
@@ -34,26 +39,34 @@ public class RoleServiceImpl implements RoleService {
         role.setId(UUID.randomUUID());
         role.setRole(newRole);
         log.info("Добавление новой роли {}", role);
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (user == null){
+            throw new UsernameNotFoundException("User not found");
+        }
+        role.setOwner(user);
         roleRepository.save(role);
     }
 
     @Override
     public List<Role> getRoles() {
-        return roleRepository.findAll();
+        return roleRepository.findAll().stream()
+                .filter(role -> role.getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()))
+                .toList();
+
     }
 
     @Override
     public Optional<Role> getRoleById(UUID id) {
-        return Optional.of(roleRepository.findById(id).get());
+        return roleRepository.findById(id)
+                .filter(role -> role.getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
     }
 
     @Override
     public void deletRoleById(UUID id) {
-        Role role = roleRepository.findById(id).orElseThrow(() -> new RuntimeException("должность не найдена"));
+        Role role = getRoleById(id).orElseThrow(() -> new RuntimeException("должность не найдена"));
         if (employeeRepository.existsByRole(role)){
             throw new RuntimeException("Невозможно удалить должность, так как она используется сотрудниками");
         }
-
         log.info("Удаление роли с id {}", id);
         roleRepository.deleteById(id);
     }

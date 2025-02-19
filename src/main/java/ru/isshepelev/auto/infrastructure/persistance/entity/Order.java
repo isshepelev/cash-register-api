@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.isshepelev.auto.infrastructure.persistance.entity.enums.OrderStatus;
 import ru.isshepelev.auto.infrastructure.service.dto.OrderMenuDto;
+import ru.isshepelev.auto.security.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,5 +31,11 @@ public class Order {
     private OrderStatus status;
     @ElementCollection
     private List<OrderMenuDto> menuList;
+
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User owner;
+
+    //TODO сделать заказы для определенного user
 
 }

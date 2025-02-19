@@ -3,11 +3,12 @@ package ru.isshepelev.auto.security.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class License {
+public class License implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,6 @@ public class License {
     @JoinColumn(name = "user_id")
     private User user;
 }
-enum LicenseType {
+enum LicenseType implements Serializable{
     MONTHLY, HALF_YEAR, YEARLY;
 }

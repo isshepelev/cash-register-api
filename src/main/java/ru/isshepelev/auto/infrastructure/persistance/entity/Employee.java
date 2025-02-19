@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import ru.isshepelev.auto.security.entity.User;
 
 import java.util.UUID;
 
@@ -24,4 +25,8 @@ public class Employee {
     @JoinColumn(name = "role_id")
     private Role role;
     private boolean isCashRegisterAccessible;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
 }
