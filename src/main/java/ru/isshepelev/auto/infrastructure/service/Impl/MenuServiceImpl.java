@@ -21,6 +21,7 @@ import ru.isshepelev.auto.security.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +31,24 @@ public class MenuServiceImpl implements MenuService {
 
     private final MenuRepository menuRepository;
     private final MenuRevisionRepository menuRevisionRepository;
-    private MenuRevision activeRevision;
-    private final UserRepository userRepository;
+    private final UserRepository userRepository; //TODO сделать сервис
+
+    private final Map<String, Long> activeRevisions = new ConcurrentHashMap<>();
 
     @Override
     public List<Menu> getItems(int page, int pageSize) {
+        Long activeRevisionId = activeRevisions.get(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (activeRevisionId == null) {
+            return Collections.emptyList();
+        }
+
+        MenuRevision activeRevision = menuRevisionRepository.findById(activeRevisionId).orElse(null);
         if (activeRevision == null) {
             return Collections.emptyList();
         }
         List<Menu> revisionMenu = activeRevision.getRevision();
         int start = page * pageSize;
-        int end = Math.min((start + pageSize), revisionMenu.size());
+        int end = Math.min(start + pageSize, revisionMenu.size());
         return revisionMenu.subList(start, end);
     }
 
@@ -163,12 +171,12 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> getMenuFromRevision(Long revisionId) {
-        return menuRevisionRepository.findByIdAndOwnerUsername(revisionId, SecurityContextHolder.getContext().getAuthentication().getName())
-                .map(revision -> {
-                    setActiveRevision(revision);
-                    return revision.getRevision();
-                })
-                .orElse(Collections.emptyList());
+        Optional<MenuRevision> revisionOpt = menuRevisionRepository.findByIdAndOwnerUsername(revisionId, SecurityContextHolder.getContext().getAuthentication().getName());
+        if (revisionOpt.isPresent()) {
+            activeRevisions.put(SecurityContextHolder.getContext().getAuthentication().getName(), revisionId);
+            return revisionOpt.get().getRevision();
+        }
+        return Collections.emptyList();
     }
 
     @Override

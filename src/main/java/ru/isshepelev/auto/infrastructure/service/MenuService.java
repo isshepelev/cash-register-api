@@ -14,7 +14,6 @@ import java.util.UUID;
 public interface MenuService {
 
 
-    void setActiveRevision(MenuRevision revision);
 
     List<Menu> getItems(int page, int pageSize);
 

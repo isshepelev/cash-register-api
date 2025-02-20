@@ -26,5 +26,5 @@ public class MenuRevision implements Serializable {
     private User owner;
 
 
-    //TODO сделать на главную страницу адекватный вывод товаров
+
 }
