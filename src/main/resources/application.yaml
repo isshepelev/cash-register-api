@@ -6,12 +6,12 @@ spring:
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
   session:
-    timeout: 100m
+    timeout: 60m
     store-type: redis
   kafka:
-    bootstrap-servers: localhost:9092 #localhost:9092 kafka:9092
+    bootstrap-servers: kafka:9092 #localhost:9092 kafka:9092
   redis:
-    host: localhost #redis localhost
+    host: redis #redis localhost
     port: 6379
