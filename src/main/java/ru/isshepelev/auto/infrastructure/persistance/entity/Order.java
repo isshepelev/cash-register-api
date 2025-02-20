@@ -32,10 +32,7 @@ public class Order {
     @ElementCollection
     private List<OrderMenuDto> menuList;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User owner;
-
-    //TODO сделать заказы для определенного user
-
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
 }
