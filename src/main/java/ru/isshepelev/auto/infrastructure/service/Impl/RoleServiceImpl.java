@@ -13,6 +13,7 @@ import ru.isshepelev.auto.infrastructure.service.EmployeeService;
 import ru.isshepelev.auto.infrastructure.service.RoleService;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
     private final EmployeeRepository employeeRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public void addRole(String newRole) {
@@ -39,7 +40,7 @@ public class RoleServiceImpl implements RoleService {
         role.setId(UUID.randomUUID());
         role.setRole(newRole);
         log.info("Добавление новой роли {}", role);
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
         if (user == null){
             throw new UsernameNotFoundException("User not found");
         }
@@ -50,7 +51,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<Role> getRoles() {
         return roleRepository.findAll().stream()
-                .filter(role -> role.getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()))
+                .filter(role -> role.getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()))
                 .toList();
 
     }
@@ -58,7 +59,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Optional<Role> getRoleById(UUID id) {
         return roleRepository.findById(id)
-                .filter(role -> role.getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
+                .filter(role -> role.getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
     }
 
     @Override

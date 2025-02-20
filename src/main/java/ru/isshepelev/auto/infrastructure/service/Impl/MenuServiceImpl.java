@@ -18,6 +18,7 @@ import ru.isshepelev.auto.infrastructure.service.MenuService;
 import ru.isshepelev.auto.infrastructure.service.dto.MenuDto;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.UserService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -31,13 +32,13 @@ public class MenuServiceImpl implements MenuService {
 
     private final MenuRepository menuRepository;
     private final MenuRevisionRepository menuRevisionRepository;
-    private final UserRepository userRepository; //TODO сделать сервис
+    private final UserService userService;
 
     private final Map<String, Long> activeRevisions = new ConcurrentHashMap<>();
 
     @Override
     public List<Menu> getItems(int page, int pageSize) {
-        Long activeRevisionId = activeRevisions.get(SecurityContextHolder.getContext().getAuthentication().getName());
+        Long activeRevisionId = activeRevisions.get(userService.getUsernameAuthorizedUser());
         if (activeRevisionId == null) {
             return Collections.emptyList();
         }
@@ -96,10 +97,7 @@ public class MenuServiceImpl implements MenuService {
         revision.setDateOfCreate(LocalDate.now());
         revision.setRevision(menuList);
 
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (user == null){
-            throw new UsernameNotFoundException("User not found");
-        }
+        User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
 
         revision.setOwner(user);
         menuRepository.saveAll(menuList);
@@ -165,15 +163,15 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuRevision> getAllRevisions() {
-        return menuRevisionRepository.findByOwnerUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        return menuRevisionRepository.findByOwnerUsername(userService.getUsernameAuthorizedUser());
     }
 
 
     @Override
     public List<Menu> getMenuFromRevision(Long revisionId) {
-        Optional<MenuRevision> revisionOpt = menuRevisionRepository.findByIdAndOwnerUsername(revisionId, SecurityContextHolder.getContext().getAuthentication().getName());
+        Optional<MenuRevision> revisionOpt = menuRevisionRepository.findByIdAndOwnerUsername(revisionId, userService.getUsernameAuthorizedUser());
         if (revisionOpt.isPresent()) {
-            activeRevisions.put(SecurityContextHolder.getContext().getAuthentication().getName(), revisionId);
+            activeRevisions.put(userService.getUsernameAuthorizedUser(), revisionId);
             return revisionOpt.get().getRevision();
         }
         return Collections.emptyList();
@@ -209,8 +207,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuRevision getRevisionById(Long revisionId) {
-        return menuRevisionRepository.findByIdAndOwnerUsername(revisionId, SecurityContextHolder.getContext().getAuthentication().getName())
+        return menuRevisionRepository.findByIdAndOwnerUsername(revisionId, userService.getUsernameAuthorizedUser())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid revision ID or unauthorized: " + revisionId));
     }
 }
-//TODO сделать отдельный метод для получения username SecurityContextHolder.getContext().getAuthentication().getName()

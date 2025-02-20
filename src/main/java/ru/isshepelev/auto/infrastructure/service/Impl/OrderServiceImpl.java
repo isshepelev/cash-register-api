@@ -16,6 +16,7 @@ import ru.isshepelev.auto.infrastructure.service.OrderService;
 import ru.isshepelev.auto.infrastructure.service.dto.OrderMenuDto;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.UserService;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -27,18 +28,18 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final MenuService menuService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public List<Order> getAllOrders() {
         return orderRepository.findAll().stream()
-                .filter(order -> order.getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())).toList();
+                .filter(order -> order.getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())).toList();
     }
 
     @Override
     public Order getOrderById(UUID id) {
         Optional<Order> orderOptional = orderRepository.findById(id)
-                .filter(order -> order.getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
+                .filter(order -> order.getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
         if (orderOptional.isEmpty()){
             throw new NullPointerException();
         }
@@ -110,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
         order = new Order(UUID.randomUUID(), LocalDate.now().atStartOfDay(), OrderStatus.CREATION, menuList);
         log.info("создание заказа " + order);
 
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
         if (user == null){
             throw new UsernameNotFoundException("User not found");
         }

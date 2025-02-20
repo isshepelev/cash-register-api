@@ -15,6 +15,7 @@ import ru.isshepelev.auto.infrastructure.service.dto.EmployeeCreateDto;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeEditDto;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.UserService;
 
 import java.util.*;
 
@@ -24,18 +25,18 @@ import java.util.*;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public List<Employee> getAllEmployee() {
         return employeeRepository.findAll().stream()
-                .filter(employee -> employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())).toList();
+                .filter(employee -> employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())).toList();
     }
 
     @Override
     public Optional<Employee> getEmployeeById(UUID id) {
         return employeeRepository.findById(id)
-                .filter(employee -> employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
+                .filter(employee -> employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
     }
 
     @Override
@@ -48,10 +49,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setRole(employeeDto.getRole());
         employee.setCashRegisterAccessible(employeeDto.isCashRegisterAccessible());
 
-        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
 
         employee.setOwner(user);
         employeeRepository.save(employee);
@@ -74,7 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         Employee employee = employeeOptional.get();
-        if (!employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+        if (!employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())) {
             throw new AccessDeniedException("Нет прав на удаление данного сотрудника");
         }
 
@@ -85,7 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> findEmployeeByPersonalCode(int personalCode) {
         return employeeRepository.findByPersonalCode(personalCode)
-                .filter(employee -> employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName()));
+                .filter(employee -> employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
     }
 
 
@@ -100,7 +98,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Employee employee = employeeOptional.get();
 
-        if (!employee.getRole().getOwner().getUsername().equals(SecurityContextHolder.getContext().getAuthentication().getName())) {
+        if (!employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())) {
             throw new AccessDeniedException("Нет прав на изменение данного сотрудника");
         }
 
