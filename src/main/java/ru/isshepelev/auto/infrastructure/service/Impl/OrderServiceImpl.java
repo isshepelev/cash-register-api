@@ -144,7 +144,7 @@ public class OrderServiceImpl implements OrderService {
             return;
         }
 
-        order.setStatus(OrderStatus.СOOKING_COMPLETED);
+        order.setStatus(OrderStatus.COOKING_COMPLETED);
         orderRepository.save(order);
 
         selectedItems.forEach(menu -> {
