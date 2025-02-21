@@ -5,6 +5,6 @@ public enum OrderStatus {
     IN_PROGRESS,
     ERROR,
     CREATION,
-    СOOKING_COMPLETED
+    COOKING_COMPLETED
 
 }
