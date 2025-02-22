@@ -2,17 +2,13 @@ package ru.isshepelev.auto.infrastructure.service.Impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.isshepelev.auto.infrastructure.persistance.entity.Employee;
-import ru.isshepelev.auto.infrastructure.persistance.entity.Role;
+import ru.isshepelev.auto.infrastructure.persistance.entity.JobTitle;
 import ru.isshepelev.auto.infrastructure.persistance.repository.EmployeeRepository;
-import ru.isshepelev.auto.infrastructure.persistance.repository.RoleRepository;
-import ru.isshepelev.auto.infrastructure.service.EmployeeService;
-import ru.isshepelev.auto.infrastructure.service.RoleService;
+import ru.isshepelev.auto.infrastructure.persistance.repository.JobTitleRepository;
+import ru.isshepelev.auto.infrastructure.service.JobTitleService;
 import ru.isshepelev.auto.security.entity.User;
-import ru.isshepelev.auto.security.repository.UserRepository;
 import ru.isshepelev.auto.security.service.UserService;
 
 import java.util.List;
@@ -22,54 +18,54 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RoleServiceImpl implements RoleService {
+public class JobTitleServiceImpl implements JobTitleService {
 
-    private final RoleRepository roleRepository;
+    private final JobTitleRepository jobTitleRepository;
     private final EmployeeRepository employeeRepository;
     private final UserService userService;
 
     @Override
-    public void addRole(String newRole) {
-        for (Role roles : getRoles()){
-            if (roles.getRole().toLowerCase().equals(newRole.toLowerCase())){
+    public void addJobTitle(String newJobTitle) {
+        for (JobTitle roles : getJobTitle()){
+            if (roles.getRole().toLowerCase().equals(newJobTitle.toLowerCase())){
                 log.warn("Должность уже существует. Добавлена не будет");
                 return;
             }
         }
-        Role role = new Role();
-        role.setId(UUID.randomUUID());
-        role.setRole(newRole);
-        log.info("Добавление новой роли {}", role);
+        JobTitle jobTitle = new JobTitle();
+        jobTitle.setId(UUID.randomUUID());
+        jobTitle.setRole(newJobTitle);
+        log.info("Добавление новой должности {}", jobTitle);
         User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
         if (user == null){
             throw new UsernameNotFoundException("User not found");
         }
-        role.setOwner(user);
-        roleRepository.save(role);
+        jobTitle.setOwner(user);
+        jobTitleRepository.save(jobTitle);
     }
 
     @Override
-    public List<Role> getRoles() {
-        return roleRepository.findAll().stream()
+    public List<JobTitle> getJobTitle() {
+        return jobTitleRepository.findAll().stream()
                 .filter(role -> role.getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()))
                 .toList();
 
     }
 
     @Override
-    public Optional<Role> getRoleById(UUID id) {
-        return roleRepository.findById(id)
+    public Optional<JobTitle> getJobTitleById(UUID id) {
+        return jobTitleRepository.findById(id)
                 .filter(role -> role.getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
     }
 
     @Override
-    public void deletRoleById(UUID id) {
-        Role role = getRoleById(id).orElseThrow(() -> new RuntimeException("должность не найдена"));
-        if (employeeRepository.existsByRole(role)){
+    public void deleteJobTitleById(UUID id) {
+        JobTitle role = getJobTitleById(id).orElseThrow(() -> new RuntimeException("должность не найдена"));
+        if (employeeRepository.existsByJobTitle(role)){
             throw new RuntimeException("Невозможно удалить должность, так как она используется сотрудниками");
         }
         log.info("Удаление роли с id {}", id);
-        roleRepository.deleteById(id);
+        jobTitleRepository.deleteById(id);
     }
 
 }

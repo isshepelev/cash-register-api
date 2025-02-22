@@ -30,13 +30,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> getAllEmployee() {
         return employeeRepository.findAll().stream()
-                .filter(employee -> employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())).toList();
+                .filter(employee -> employee.getJobTitle().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())).toList();
     }
 
     @Override
     public Optional<Employee> getEmployeeById(UUID id) {
         return employeeRepository.findById(id)
-                .filter(employee -> employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
+                .filter(employee -> employee.getJobTitle().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setName(employeeDto.getName());
         employee.setSurname(employeeDto.getSurname());
         employee.setPersonalCode(generateUniquePersonalCode());
-        employee.setRole(employeeDto.getRole());
+        employee.setJobTitle(employeeDto.getJobTitle());
         employee.setCashRegisterAccessible(employeeDto.isCashRegisterAccessible());
 
         User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
@@ -72,7 +72,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         Employee employee = employeeOptional.get();
-        if (!employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())) {
+        if (!employee.getJobTitle().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())) {
             throw new AccessDeniedException("Нет прав на удаление данного сотрудника");
         }
 
@@ -83,7 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Optional<Employee> findEmployeeByPersonalCode(int personalCode) {
         return employeeRepository.findByPersonalCode(personalCode)
-                .filter(employee -> employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
+                .filter(employee -> employee.getJobTitle().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser()));
     }
 
 
@@ -98,11 +98,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Employee employee = employeeOptional.get();
 
-        if (!employee.getRole().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())) {
+        if (!employee.getJobTitle().getOwner().getUsername().equals(userService.getUsernameAuthorizedUser())) {
             throw new AccessDeniedException("Нет прав на изменение данного сотрудника");
         }
 
-        employee.setRole(dto.getRole());
+        employee.setJobTitle(dto.getJobTitle());
         employee.setName(dto.getName());
         employee.setSurname(dto.getSurname());
         employee.setCashRegisterAccessible(dto.isCashRegisterAccessible());

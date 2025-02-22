@@ -197,9 +197,9 @@
                 <input type="text" id="surname" name="surname" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="role" class="form-label">Роль</label>
-                <select id="role" name="role" class="form-control" required>
-                    <option th:each="role : ${roles}" th:value="${role.id}" th:text="${role.role}"></option>
+                <label for="jobTitle" class="form-label">Должность</label>
+                <select id="jobTitle" name="jobTitle.id" class="form-control" required>
+                    <option th:each="jobTitle : ${jobTitles}" th:value="${jobTitle.id}" th:text="${jobTitle.role}"></option>
                 </select>
             </div>
             <div class="mb-3 form-check">
@@ -228,7 +228,7 @@
             <tr>
                 <th>Имя</th>
                 <th>Фамилия</th>
-                <th>Роль</th>
+                <th>Должность</th>
                 <th>Личный код</th>
                 <th>Доступ к кассе</th>
                 <th>Действия</th>
@@ -238,7 +238,7 @@
             <tr th:each="employee : ${employees}">
                 <td th:text="${employee.name}">Иван</td>
                 <td th:text="${employee.surname}">Иванов</td>
-                <td th:text="${employee.role.role}">Менеджер</td>
+                <td th:text="${employee.jobTitle.role}">Менеджер</td>
                 <td th:text="${employee.personalCode}">123</td>
                 <td th:text="${employee.isCashRegisterAccessible ? 'Да' : 'Нет'}">Да</td>
                 <td>
@@ -266,15 +266,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="role : ${roles}">
-                <td th:text="${role.role}">Администратор</td>
+            <tr th:each="jobTitle : ${jobTitles}">
+                <td th:text="${jobTitle.role}">Администратор</td>
                 <td style="display: flex; align-items: center;">
-                    <form th:action="@{'/employees/roles/delete/' + ${role.id}}" method="post">
+                    <form th:action="@{'/employees/roles/delete/' + ${jobTitle.id}}" method="post">
                         <button type="submit" class="btn-danger">Удалить</button>
                     </form>
-                    <span th:if="${role.employees != null and role.employees.size() > 0}" style="color: red; margin-left: 10px;">
-            Невозможно удалить, должность используется
-        </span>
+                    <span th:if="${jobTitle.employees != null and jobTitle.employees.size() > 0}" style="color: red; margin-left: 10px;">
+                        Невозможно удалить, должность используется
+                    </span>
                 </td>
             </tr>
             </tbody>

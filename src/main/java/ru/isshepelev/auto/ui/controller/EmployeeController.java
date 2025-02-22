@@ -7,15 +7,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.isshepelev.auto.infrastructure.persistance.entity.Employee;
 import ru.isshepelev.auto.infrastructure.service.EmployeeService;
-import ru.isshepelev.auto.infrastructure.service.RoleService;
+import ru.isshepelev.auto.infrastructure.service.JobTitleService;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeCreateDto;
 import ru.isshepelev.auto.infrastructure.service.dto.EmployeeEditDto;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -24,13 +21,13 @@ import java.util.UUID;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final RoleService roleService;
+    private final JobTitleService jobTitleService;
 
 
     @GetMapping
     public String listEmployees(Model model) {
         model.addAttribute("employees", employeeService.getAllEmployee());
-        model.addAttribute("roles", roleService.getRoles());
+        model.addAttribute("jobTitles", jobTitleService.getJobTitle());
         return "employees";
     }
 
@@ -51,8 +48,8 @@ public class EmployeeController {
 
     @PostMapping("/roles/create")
     public String createRole(@RequestParam String role, RedirectAttributes redirectAttributes) {
-        roleService.addRole(role);
-        redirectAttributes.addFlashAttribute("roles", roleService.getRoles());
+        jobTitleService.addJobTitle(role);
+        redirectAttributes.addFlashAttribute("jobTitles", jobTitleService.getJobTitle());
         return "redirect:/employees";
     }
 
@@ -60,7 +57,7 @@ public class EmployeeController {
     @PostMapping("/roles/delete/{id}")
     public String deleteRole(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
         try {
-            roleService.deletRoleById(id);
+            jobTitleService.deleteJobTitleById(id);
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
@@ -72,7 +69,7 @@ public class EmployeeController {
     public String editEmployeeForm(@PathVariable UUID id, Model model) {
         model.addAttribute("employees", employeeService.getAllEmployee());
         model.addAttribute("employee", employeeService.getEmployeeById(id).get());
-        model.addAttribute("roles", roleService.getRoles());
+        model.addAttribute("jobTitles", jobTitleService.getJobTitle());
         return "edit-employee";
     }
 

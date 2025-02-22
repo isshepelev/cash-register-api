@@ -22,8 +22,8 @@ public class Employee {
     private int personalCode;
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @JoinColumn(name = "jobTitle_id")
+    private JobTitle jobTitle;
     private boolean isCashRegisterAccessible;
 
     @ManyToOne

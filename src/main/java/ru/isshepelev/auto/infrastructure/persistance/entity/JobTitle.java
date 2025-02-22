@@ -13,11 +13,14 @@ import java.util.UUID;
 
 @Data
 @Entity
-public class Role implements  Serializable {
+public class JobTitle implements Serializable {
+
     @Id
     private UUID id;
+
     private String role;
-    @OneToMany(mappedBy = "role")
+
+    @OneToMany(mappedBy = "jobTitle")
     @ToString.Exclude
     private List<Employee> employees;
 
