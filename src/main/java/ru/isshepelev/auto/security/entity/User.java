@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -32,5 +33,10 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "roleUser_id"))
     private Set<Role> roles;
+
+
+    public boolean hasValidLicense() {
+        return license != null && license.getEndDate().isAfter(LocalDateTime.now());
+    }
 
 }

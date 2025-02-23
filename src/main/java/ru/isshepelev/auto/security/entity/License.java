@@ -23,7 +23,9 @@ public class License implements Serializable {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-}
-enum LicenseType implements Serializable{
-    MONTHLY, HALF_YEAR, YEARLY;
+
+
+    public enum LicenseType implements Serializable{
+        MONTHLY, HALF_YEAR, YEARLY;
+    }
 }

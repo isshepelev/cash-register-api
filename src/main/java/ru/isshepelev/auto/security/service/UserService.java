@@ -7,4 +7,6 @@ public interface UserService {
     String getUsernameAuthorizedUser();
 
     User getUserByUsername(String username);
+
+    void buyLicense(String period);
 }

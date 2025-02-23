@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import ru.isshepelev.auto.security.entity.License;
 import ru.isshepelev.auto.security.entity.Role;
 import ru.isshepelev.auto.security.entity.User;
+import ru.isshepelev.auto.security.repository.LicenseRepository;
 import ru.isshepelev.auto.security.repository.RoleRepository;
 import ru.isshepelev.auto.security.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Component
@@ -18,6 +21,7 @@ public class DataLoader implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final LicenseRepository licenseRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -54,5 +58,14 @@ public class DataLoader implements CommandLineRunner {
         userRepository.save(user1);
         userRepository.save(user2);
         userRepository.save(user3);
+
+        License license = new License();
+        license.setType(License.LicenseType.MONTHLY);
+        license.setStartDate(LocalDateTime.now());
+        license.setEndDate(LocalDateTime.now().plusMonths(1));
+        license.setUser(user1);
+        licenseRepository.save(license);
+        user1.setLicense(license);
+        userRepository.save(user1);
     }
 }
