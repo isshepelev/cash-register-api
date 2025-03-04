@@ -17,7 +17,7 @@ public class CustomErrorController implements ErrorController {
         model.addAttribute("status", statusCode);
         if (statusCode == 404) {
             return "error/404";
-        } else if (statusCode == 403) { //TODO не показывается 403 ошибка
+        } else if (statusCode == 403) {
             return "error/403";
         }
         return "error/error";
