@@ -1,4 +1,4 @@
-package ru.isshepelev.auto.security.service;
+package ru.isshepelev.auto;
 
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
