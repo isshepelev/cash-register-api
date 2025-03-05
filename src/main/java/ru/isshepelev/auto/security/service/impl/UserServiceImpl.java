@@ -60,7 +60,8 @@ public class UserServiceImpl implements UserService {
                     roleRepository.findAll(),
                     user.getLicense() != null ? user.getLicense().getEndDate() : null,
                     user.hasValidLicense(),
-                    true
+                    true,
+                    user.getSubUsers()
             );
         }
         SubUser subUser = subUserService.getSubUserByUsername(username);
@@ -69,7 +70,8 @@ public class UserServiceImpl implements UserService {
                 Collections.emptyList(),
                 null,
                 false,
-                false
+                false,
+                null
         );
     }
 
@@ -100,8 +102,6 @@ public class UserServiceImpl implements UserService {
         if (user.hasValidLicense()){
             user.getLicense().setEndDate(user.getLicense().getEndDate().plus(days));
             user.getLicense().setType(type);
-            System.out.println(user.getLicense().getEndDate());
-
         }else {
             License license = new License();
             license.setUser(user);

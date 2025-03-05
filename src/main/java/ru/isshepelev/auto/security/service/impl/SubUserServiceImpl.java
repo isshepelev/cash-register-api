@@ -2,6 +2,7 @@ package ru.isshepelev.auto.security.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.isshepelev.auto.security.entity.SubUser;
@@ -9,8 +10,10 @@ import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.SubUserRepository;
 import ru.isshepelev.auto.security.repository.UserRepository;
 import ru.isshepelev.auto.security.service.SubUserService;
+import ru.isshepelev.auto.security.service.UserService;
 import ru.isshepelev.auto.ui.dto.CreateSubUserDto;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +28,10 @@ public class SubUserServiceImpl implements SubUserService {
     public SubUser getSubUserByUsername(String username) {
         return Optional.ofNullable(subUserRepository.findByUsername(username))
                 .orElse(null);
+    }
+    @Override
+    public List<SubUser> getAllSubUsers(){
+        return userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName()).getSubUsers();
     }
 
     @Override
@@ -50,5 +57,15 @@ public class SubUserServiceImpl implements SubUserService {
         subUserRepository.save(subUser);
         log.info("Создан работник {} у пользователя {}", subUser.getUsername(), owner.getUsername());
         return true;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Optional<SubUser> subUserOptional = subUserRepository.findById(id);
+        if (subUserOptional.isEmpty()){
+            log.error("пользователь с id " + id + "  не найден");
+            throw new NullPointerException();
+        }
+        subUserRepository.deleteById(id);
     }
 }

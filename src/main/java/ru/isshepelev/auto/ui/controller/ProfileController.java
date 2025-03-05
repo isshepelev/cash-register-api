@@ -28,6 +28,7 @@ public class ProfileController {
         model.addAttribute("username", username);
 
         ProfileDto profileDto = userService.getProfileInfo(username);
+        model.addAttribute("employees", profileDto.getListSubUsers());
         model.addAttribute("roles", profileDto.getRoles());
         model.addAttribute("allRoles", profileDto.getAllRoles());
         model.addAttribute("licenseEndDate", profileDto.getLicenseEndDate());
@@ -50,4 +51,12 @@ public class ProfileController {
         }
         return "redirect:/profile";
     }
+
+    @PostMapping("/delete/subUser/{id}")
+    public String deleteSubUserById(@PathVariable Long id){
+        subUserService.deleteById(id);
+        return "redirect:/profile";
+    }
+
 }
+//TODO сделать удаление работника изменение работника возможно сделать добавление ролей (смысла нет так как нельзя будет сделать разграничения ролей) а так же вывод всех работников

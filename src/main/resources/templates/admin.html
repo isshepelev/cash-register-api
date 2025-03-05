@@ -7,6 +7,35 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: #2c2f33;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
     .create-worker-menu {
         margin-left: 20px;
         padding: 20px;
@@ -76,6 +105,30 @@
             <button type="submit">Создать</button>
         </form>
     </div>
+    <button onclick="openEmployeeModal()">Показать работников</button>
+
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEmployeeModal()">&times;</span>
+            <h3>Список работников</h3>
+            <ul>
+                <li th:each="employee : ${employees}">
+                    <span th:text="${employee.getUsername()}"></span>
+                    <form th:action="@{/profile/delete/subUser/{id}(id=${employee.id})}" method="post" style="display:inline;">
+                        <button type="submit">Удалить</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 </body>
+<script>
+    function openEmployeeModal() {
+        document.getElementById("employeeModal").style.display = "block";
+    }
+    function closeEmployeeModal() {
+        document.getElementById("employeeModal").style.display = "none";
+    }
+</script>
 </html>
