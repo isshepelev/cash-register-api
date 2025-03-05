@@ -26,9 +26,11 @@ public class SecurityConfiguration{
                 .csrf(c -> c.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/register").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/profile/admin").hasAnyRole("ADMIN")
+                        .requestMatchers("/menu").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers("/employees/**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers("/orders/**").hasAnyRole("BOOKKEEPER", "ADMIN")
+                        .requestMatchers("/").hasAnyRole("USER", "MANAGER", "ADMIN")
+                        .requestMatchers("/menu/stop-list").hasAnyRole("USER", "MANAGER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
