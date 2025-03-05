@@ -28,6 +28,7 @@ public class SecurityConfiguration{
                         .requestMatchers("/register").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/profile/admin").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

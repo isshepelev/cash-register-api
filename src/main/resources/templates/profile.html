@@ -4,107 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профиль владельца</title>
-    <style>
-
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #2c2f33;
-            color: #ffffff;
-        }
-        .role-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #4caf50;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .container {
-            width: 60%;
-            max-width: 800px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background-color: #23272a;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 40%;
-            text-align: center;
-        }
-
-        .username {
-            font-size: 1.5em;
-            margin: 10px 0;
-        }
-
-        .license-status {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .buttons-container {
-            display: flex;
-            gap: 20px;
-            width: 60%;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .buttons-container button, .buttons-container a {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background-color: #368f00;
-            color: #fff;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .buttons-container button:hover, .buttons-container a:hover {
-            background-color: #007007;
-            transform: translateY(-2px);
-        }
-        .logout-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 15px;
-            font-size: 16px;
-            background-color: #d9534f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        .logout-button:hover {
-            background-color: #c9302c;
-            transform: translateY(-2px);
-        }
-
-
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 <a href="/logout" class="logout-button">Выйти</a>
@@ -112,17 +12,8 @@
     <div class="profile-info">
         <div class="role-badge" th:text="'Роль: ' + ${roles}"></div>
         <div class="username" th:text="${username}"></div>
-        <div class="license-status"
-             th:classappend="${licenseActive} ? 'active-license' : 'inactive-license'"
-             th:text="${licenseEndDate != null} ? 'Активна до ' + ${#temporals.format(licenseEndDate, 'dd MMMM yyyy', new java.util.Locale('ru'))} : 'Лицензия не активна'"></div>
     </div>
-    <div class="buttons-container">
-        <form action="/profile/buy-license" method="post">
-            <button type="submit" name="period" value="MONTHLY">Купить лицензию на 1 месяц</button>
-            <button type="submit" name="period" value="HALF_YEAR">Купить лицензию на 6 месяцев</button>
-            <button type="submit" name="period" value="YEARLY">Купить лицензию на 1 год</button>
-        </form>
-    </div>
+
     <div class="buttons-container">
         <a href="/menu" class="button">Просмотр меню</a>
         <a href="/employees" class="button">Работники</a>

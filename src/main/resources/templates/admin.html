@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль владельца</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<style>
+    .create-worker-menu {
+        margin-left: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        width: 250px;
+        position: absolute;
+        top: 100px;
+        right: 30px;
+    }
+    .create-worker-menu form {
+        display: flex;
+        flex-direction: column;
+    }
+    .create-worker-menu label {
+        margin-top: 10px;
+    }
+    .create-worker-menu input,
+    .create-worker-menu select {
+        padding: 8px;
+        margin-top: 5px;
+    }
+
+</style>
+<body>
+<a href="/logout" class="logout-button">Выйти</a>
+<div class="container">
+    <div class="profile-info">
+        <div class="role-badge" th:text="'Роль: ' + ${roles}"></div>
+        <div class="username" th:text="${username}"></div>
+        <div class="license-status"
+             th:classappend="${licenseActive} ? 'active-license' : 'inactive-license'"
+             th:text="${licenseEndDate != null} ? 'Активна до ' + ${#temporals.format(licenseEndDate, 'dd MMMM yyyy', new java.util.Locale('ru'))} : 'Лицензия не активна'"></div>
+    </div>
+    <div class="buttons-container">
+        <form action="/profile/buy-license" method="post">
+            <button type="submit" name="period" value="MONTHLY">Купить лицензию на 1 месяц</button>
+            <button type="submit" name="period" value="HALF_YEAR">Купить лицензию на 6 месяцев</button>
+            <button type="submit" name="period" value="YEARLY">Купить лицензию на 1 год</button>
+        </form>
+    </div>
+    <div class="buttons-container">
+        <a href="/menu" class="button">Просмотр меню</a>
+        <a href="/employees" class="button">Работники</a>
+        <a href="/orders" class="button">Заказы</a>
+        <a href="/" class="button">Касса</a>
+        <a href="/menu/stop-list" class="button">Стоп лист</a>
+        <a href="/menu/create" class="button">Создать меню</a>
+    </div>
+    <div class="create-worker-menu">
+        <h3>Создание работника</h3>
+        <form action="/profile/create-subUser" method="post">
+            <label for="username">Имя пользователя</label>
+            <input type="text" id="username" name="username" required>
+            <label for="email">Электронная почта</label>
+            <input type="email" id="email" name="email" required>
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" required>
+            <label for="role">Роль</label>
+            <select id="role" name="role">
+                <th:block th:each="role : ${allRoles}">
+                    <option th:value="${role.id}" th:text="${role.name}"></option>
+                </th:block>
+            </select>
+            <div th:if="${error}">
+                <p th:text="${error}" style="color: red;"></p>
+            </div>
+            <button type="submit">Создать</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

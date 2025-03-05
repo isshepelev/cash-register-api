@@ -11,6 +11,7 @@ import ru.isshepelev.auto.security.dto.SignInDto;
 import ru.isshepelev.auto.security.dto.SignUpDto;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.SubUserService;
 
 @Controller
 @AllArgsConstructor
@@ -18,6 +19,7 @@ import ru.isshepelev.auto.security.repository.UserRepository;
 public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SubUserService subUserService;
 
     @GetMapping("/register")
     public String showRegistrationForm() {
@@ -26,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute SignUpDto signUpDto, Model model) {
-        if (userRepository.findByUsername(signUpDto.getUsername()) != null) {
+        if (userRepository.findByUsername(signUpDto.getUsername()) != null || subUserService.getSubUserByUsername(signUpDto.getUsername()) != null) {
             model.addAttribute("error", "Пользователь уже существует");
             return "register";
         }

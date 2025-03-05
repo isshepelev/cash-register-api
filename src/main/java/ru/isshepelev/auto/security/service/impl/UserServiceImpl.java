@@ -5,14 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.isshepelev.auto.security.dto.ProfileDto;
 import ru.isshepelev.auto.security.entity.License;
+import ru.isshepelev.auto.security.entity.Role;
+import ru.isshepelev.auto.security.entity.SubUser;
 import ru.isshepelev.auto.security.entity.User;
 import ru.isshepelev.auto.security.repository.LicenseRepository;
+import ru.isshepelev.auto.security.repository.RoleRepository;
 import ru.isshepelev.auto.security.repository.UserRepository;
+import ru.isshepelev.auto.security.service.SubUserService;
 import ru.isshepelev.auto.security.service.UserService;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +28,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final LicenseRepository licenseRepository;
-
+    private final RoleRepository roleRepository;
+    private final SubUserService subUserService;
 
     @Override
     public String getUsernameAuthorizedUser() {
@@ -41,6 +49,28 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Пользователь не найден");
         }
         return user;
+    }
+
+    @Override
+    public ProfileDto getProfileInfo(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user != null) {
+            return new ProfileDto(
+                    user.getRoles().stream().map(Role::getName).collect(Collectors.joining(", ")),
+                    roleRepository.findAll(),
+                    user.getLicense() != null ? user.getLicense().getEndDate() : null,
+                    user.hasValidLicense(),
+                    true
+            );
+        }
+        SubUser subUser = subUserService.getSubUserByUsername(username);
+        return new ProfileDto(
+                subUser.getRoles().stream().map(Role::getName).collect(Collectors.joining(", ")),
+                Collections.emptyList(),
+                null,
+                false,
+                false
+        );
     }
 
     @Override

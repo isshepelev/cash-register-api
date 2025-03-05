@@ -1,10 +1,12 @@
 package ru.isshepelev.auto.security.service;
 
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import ru.isshepelev.auto.security.entity.SubUser;
 import ru.isshepelev.auto.security.entity.User;
 
 import java.util.Collection;
@@ -13,11 +15,13 @@ import java.util.stream.Collectors;
 
 @Component
 @NoArgsConstructor
+@Data
 public class CustomUserDetails implements UserDetails {
 
     private String username;
     private String password;
     private Set<GrantedAuthority> authorities;
+    private Long ownerId;
 
     public CustomUserDetails(User user) {
         this.username = user.getUsername();
@@ -25,6 +29,16 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toSet());
+        this.ownerId = user.getId();
+    }
+
+    public CustomUserDetails(SubUser subUser) {
+        this.username = subUser.getUsername();
+        this.password = subUser.getPassword();
+        this.authorities = subUser.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toSet());
+        this.ownerId = subUser.getOwner().getId();
     }
 
     @Override

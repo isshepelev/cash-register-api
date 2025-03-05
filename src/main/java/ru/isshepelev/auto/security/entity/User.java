@@ -3,9 +3,12 @@ package ru.isshepelev.auto.security.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,6 +37,8 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "roleUser_id"))
     private Set<Role> roles;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<SubUser> subUsers = new ArrayList<>();
 
     public boolean hasValidLicense() {
         return license != null && license.getEndDate().isAfter(LocalDateTime.now());
