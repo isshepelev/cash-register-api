@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.isshepelev.auto.infrastructure.exception.UsernameAlreadyExistsException;
 import ru.isshepelev.auto.security.dto.ProfileDto;
+import ru.isshepelev.auto.security.dto.SignUpDto;
 import ru.isshepelev.auto.security.entity.License;
 import ru.isshepelev.auto.security.entity.Role;
 import ru.isshepelev.auto.security.entity.SubUser;
@@ -19,6 +22,7 @@ import ru.isshepelev.auto.security.service.UserService;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +34,29 @@ public class UserServiceImpl implements UserService {
     private final LicenseRepository licenseRepository;
     private final RoleRepository roleRepository;
     private final SubUserService subUserService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public void registerUser(SignUpDto signUpDto) {
+        if (userRepository.findByUsername(signUpDto.getUsername()) != null || subUserService.getSubUserByUsername(signUpDto.getUsername()) != null) {
+            throw new UsernameAlreadyExistsException("Пользователь уже существует");
+        }
+
+        User user = new User();
+        user.setUsername(signUpDto.getUsername());
+        user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
+        user.setEmail(signUpDto.getEmail());
+
+        Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+        if (adminRole == null) {
+            adminRole = new Role();
+            adminRole.setName("ROLE_ADMIN");
+            roleRepository.save(adminRole);
+        }
+
+        user.setRoles(Set.of(adminRole));
+        userRepository.save(user);
+    }
 
     @Override
     public String getUsernameAuthorizedUser() {
