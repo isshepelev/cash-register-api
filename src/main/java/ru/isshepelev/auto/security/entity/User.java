@@ -44,4 +44,9 @@ public class User implements Serializable {
         return license != null && license.getEndDate().isAfter(LocalDateTime.now());
     }
 
+    @Override
+    public String toString() {
+        return "User{id=" + id + ", username='" + username + "', email='" + email + "'}";
+    }
+
 }

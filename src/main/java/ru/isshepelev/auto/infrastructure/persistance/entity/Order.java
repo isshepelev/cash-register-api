@@ -1,7 +1,7 @@
 package ru.isshepelev.auto.infrastructure.persistance.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.isshepelev.auto.infrastructure.persistance.entity.enums.OrderStatus;
@@ -34,5 +34,6 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User owner;
 }

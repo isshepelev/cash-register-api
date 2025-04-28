@@ -28,4 +28,9 @@ public class License implements Serializable {
     public enum LicenseType implements Serializable{
         MONTHLY, HALF_YEAR, YEARLY;
     }
+
+    @Override
+    public String toString() {
+        return "License{id=" + id + ", type=" + type + ", startDate=" + startDate + ", endDate=" + endDate + "}";
+    }
 }

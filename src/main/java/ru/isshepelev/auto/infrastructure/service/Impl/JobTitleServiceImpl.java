@@ -35,12 +35,12 @@ public class JobTitleServiceImpl implements JobTitleService {
         JobTitle jobTitle = new JobTitle();
         jobTitle.setId(UUID.randomUUID());
         jobTitle.setRole(newJobTitle);
-        log.info("Добавление новой должности {}", jobTitle);
         User user = userService.getUserByUsername(userService.getUsernameAuthorizedUser());
         if (user == null){
             throw new UsernameNotFoundException("User not found");
         }
         jobTitle.setOwner(user);
+        log.info("Добавление новой должности {}", jobTitle);
         jobTitleRepository.save(jobTitle);
     }
 

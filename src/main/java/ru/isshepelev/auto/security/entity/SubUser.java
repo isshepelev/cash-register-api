@@ -1,5 +1,6 @@
 package ru.isshepelev.auto.security.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,6 +23,7 @@ public class SubUser implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonBackReference
     private User owner;
 
     @ManyToMany(fetch = FetchType.EAGER)

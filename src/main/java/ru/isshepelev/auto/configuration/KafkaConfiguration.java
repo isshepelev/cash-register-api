@@ -1,5 +1,9 @@
 package ru.isshepelev.auto.configuration;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.StreamWriteConstraints;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -17,9 +21,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import ru.isshepelev.auto.infrastructure.persistance.entity.Order;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Configuration
 @EnableKafka
@@ -32,6 +34,10 @@ public class KafkaConfiguration {
     @Bean
     public KafkaTemplate<String, Order> uuidListKafkaTemplate(ObjectMapper objectMapper,
                                                               @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.configure(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+        objectMapper.getFactory().setStreamWriteConstraints(StreamWriteConstraints.builder().maxNestingDepth(2000).build());
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
